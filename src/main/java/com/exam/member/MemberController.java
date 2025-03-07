@@ -7,18 +7,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
+@Slf4j
 public class MemberController {
-    MemberService memberService;
+	MemberService memberService;
 
-    public MemberController(MemberService memberService) {
-        this.memberService = memberService;
-    }
+	public MemberController(MemberService memberService) {
+		this.memberService = memberService;
+	}
 
-    @GetMapping("/home")
-    public ResponseEntity<String> home(){
-        return ResponseEntity.status(200).body("home"); // 200 OK 상태 코드와 함께 "home" 반환
-    }
+	@GetMapping("/home")
+	public ResponseEntity<String> home() {
+		return ResponseEntity.status(200).body("home"); // 200 OK 상태 코드와 함께 "home" 반환
+	}
 
     /*
 	 	headers : Content-Type:application/json
@@ -35,23 +39,17 @@ public class MemberController {
 				}
 	 */
 
-    @PostMapping("/signup")
-    public ResponseEntity<MemberDTO> signup(@RequestBody MemberDTO dto) {
-        try {
-            // 비밀번호 암호화
-            String encodedPW = new BCryptPasswordEncoder().encode(dto.getPasswd());
-            dto.setPasswd(encodedPW);  // 암호화된 비밀번호로 DTO 업데이트
+	@PostMapping("/signup")
+	public ResponseEntity<MemberDTO> signup(@Valid @RequestBody MemberDTO dto) {
+		log.info("비번 암호화전: {}", dto.getPasswd());
+		//비번을 암호화 해야됨.
+		String encodedPW = new BCryptPasswordEncoder().encode(dto.getPasswd());
+		log.info("비번 암호화후: {}", encodedPW);
 
-            // 회원가입 서비스 호출
-            memberService.save(dto);  // 예외가 발생하지 않으면 성공으로 간주
+		dto.setPasswd(encodedPW);
+		memberService.save(dto);
 
-            return ResponseEntity.created(null).body(dto);  // 201 Created
-
-        } catch (Exception e) {
-            // 회원가입 처리 실패 시
-            return ResponseEntity.status(400).body(dto);  // 400 Bad Request
-        }
-    }
-
+		return ResponseEntity.created(null).body(dto);  // 201 상태코드 반환됨.
+	}
 
 }

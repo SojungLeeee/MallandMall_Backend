@@ -1,4 +1,4 @@
-package com.exam.member;
+package com.exam.user;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -17,7 +17,7 @@ import lombok.ToString;
 @ToString
 @Builder
 @Entity
-public class Member {
+public class User {
 
 	@Id
 	String userid;  // 아이디 (primary key)

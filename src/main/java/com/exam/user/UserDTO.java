@@ -1,4 +1,4 @@
-package com.exam.member;
+package com.exam.user;
 
 import java.time.LocalDate;
 
@@ -21,7 +21,7 @@ import lombok.ToString;
 @ToString
 @Builder
 @Alias("MemberDTO")
-public class MemberDTO {
+public class UserDTO {
 
 	@NotBlank(message = "아이디 입력 필수")
 	String userid;  // 아이디 (primary key)

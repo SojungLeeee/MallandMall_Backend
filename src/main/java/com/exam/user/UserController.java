@@ -1,4 +1,4 @@
-package com.exam.member;
+package com.exam.user;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,10 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
-public class MemberController {
-	MemberService memberService;
+public class UserController {
+	UserService memberService;
 
-	public MemberController(MemberService memberService) {
+	public UserController(UserService memberService) {
 		this.memberService = memberService;
 	}
 
@@ -40,7 +40,7 @@ public class MemberController {
 	 */
 
 	@PostMapping("/signup")
-	public ResponseEntity<MemberDTO> signup(@Valid @RequestBody MemberDTO dto) {
+	public ResponseEntity<UserDTO> signup(@Valid @RequestBody UserDTO dto) {
 		log.info("비번 암호화전: {}", dto.getPasswd());
 		//비번을 암호화 해야됨.
 		String encodedPW = new BCryptPasswordEncoder().encode(dto.getPasswd());

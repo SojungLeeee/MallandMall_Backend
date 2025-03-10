@@ -20,16 +20,16 @@ import lombok.ToString;
 @Setter
 @ToString
 @Builder
-@Alias("MemberDTO")
+@Alias("UserDTO")
 public class UserDTO {
 
-	@NotBlank(message = "아이디 입력 필수")
+	@NotBlank(message = "User ID 필수")
 	String userid;  // 아이디 (primary key)
 
-	@NotBlank(message = "비밀번호 입력 필수")
+	@NotBlank(message = "User passwd 필수")
 	String passwd;  // 비밀번호
 
-	@NotBlank(message = "사용자명 입력 필수")
+	@NotBlank(message = "User username 필수")
 	String username;  // 사용자 이름
 
 	String post;  // 주소

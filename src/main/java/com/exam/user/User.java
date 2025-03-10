@@ -1,9 +1,5 @@
 package com.exam.user;
 
-import java.time.LocalDate;
-
-import org.hibernate.annotations.CreationTimestamp;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -25,8 +21,13 @@ import lombok.ToString;
 public class User {
 
 	@Id
+	@Column(nullable = false)
 	String userid;  // 아이디 (primary key)
+
+	@Column(nullable = false)
 	String passwd;  // 비밀번호
+
+	@Column(nullable = false)
 	String username;  // 사용자 이름
 	String post;  // 주소
 	String addr1;  // 주소1
@@ -34,9 +35,5 @@ public class User {
 	String phoneNumber;  // 전화번호
 	String email;  // 이메일
 	String role = "USER";  // 역할, 기본값 'USER'
-
-	@CreationTimestamp
-	@Column(updatable = false) //저장할때만 자동저장O 수정할때는 저장 X 을위한것
-	LocalDate createDate; //저장할때만 자동저장O 수정할때는 저장 X
 
 }

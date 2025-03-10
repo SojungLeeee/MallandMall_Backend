@@ -19,11 +19,11 @@ import com.exam.user.UserService;
 @Component
 public class JwtTokenProvider {
 
-	UserService memberService;
+	UserService userService;
 	JwtTokenService tokenService;
 
-	public JwtTokenProvider(UserService memberService, JwtTokenService tokenService) {
-		this.memberService = memberService;
+	public JwtTokenProvider(UserService userService, JwtTokenService tokenService) {
+		this.userService = userService;
 		this.tokenService = tokenService;
 	}
 
@@ -33,7 +33,7 @@ public class JwtTokenProvider {
 		String userid = map.get("userid");
 		String passwd = map.get("passwd");
 
-		UserDTO dto = memberService.findById(userid);
+		UserDTO dto = userService.findById(userid);
 
 		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		UsernamePasswordAuthenticationToken token = null;

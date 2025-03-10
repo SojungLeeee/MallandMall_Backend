@@ -13,10 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Slf4j
 public class UserController {
-	UserService memberService;
+	UserService userService;
 
-	public UserController(UserService memberService) {
-		this.memberService = memberService;
+	public UserController(UserService userService) {
+		this.userService = userService;
 	}
 
 	@GetMapping("/home")
@@ -47,7 +47,7 @@ public class UserController {
 		log.info("비번 암호화후: {}", encodedPW);
 
 		dto.setPasswd(encodedPW);
-		memberService.save(dto);
+		userService.save(dto);
 
 		return ResponseEntity.created(null).body(dto);  // 201 상태코드 반환됨.
 	}

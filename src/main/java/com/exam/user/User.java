@@ -1,5 +1,6 @@
 package com.exam.user;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
@@ -20,8 +21,13 @@ import lombok.ToString;
 public class User {
 
 	@Id
+	@Column(nullable = false)
 	String userid;  // 아이디 (primary key)
+
+	@Column(nullable = false)
 	String passwd;  // 비밀번호
+
+	@Column(nullable = false)
 	String username;  // 사용자 이름
 	String post;  // 주소
 	String addr1;  // 주소1

@@ -1,8 +1,8 @@
 package com.exam.mypage;
 
-import com.exam.user.User;
-
 import org.springframework.stereotype.Service;
+
+import com.exam.user.User;
 
 @Service
 public class MypageServiceImpl implements MypageService {
@@ -50,16 +50,16 @@ public class MypageServiceImpl implements MypageService {
 		mypageRepository.deleteById(userid);
 	}
 
-	private MypageDTO convertToDTO(User User) {
+	private MypageDTO convertToDTO(User user) {
 		return MypageDTO.builder()
-			.userid(User.getUserid())
-			.username(User.getUsername())
-			.post(User.getPost())
-			.addr1(User.getAddr1())
-			.addr2(User.getAddr2())
-			.phoneNumber(User.getPhoneNumber())
-			.email(User.getEmail())
-			.role(User.getRole())
+			.userid(user.getUserid())
+			.username(user.getUsername())
+			.post(user.getPost())
+			.addr1(user.getAddr1())
+			.addr2(user.getAddr2())
+			.phoneNumber(user.getPhoneNumber())
+			.email(user.getEmail())
+			.role(user.getRole())
 			.build();
 	}
 }

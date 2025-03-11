@@ -1,6 +1,5 @@
 package com.exam.exception;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
 
 import org.springframework.http.HttpHeaders;
@@ -8,8 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -20,7 +18,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
-@RestControllerAdvice
+@ControllerAdvice
 @Slf4j
 public class CustomizedResponseEntityExceptionHandler
 	extends ResponseEntityExceptionHandler {
@@ -40,16 +38,16 @@ public class CustomizedResponseEntityExceptionHandler
 
 	}//end handleMethodArgumentNotValid
 
-	// 사용자 userid 중복 예외처리
-	@ExceptionHandler(value = {SQLIntegrityConstraintViolationException.class})
-	public ResponseEntity<ErrorDetails> errorPage(Exception e) {
-		log.info("logger:사용자 userid 중복 예외처리.: {}", e.getMessage());
-
-		ErrorDetails errorDetails =
-			new ErrorDetails("아이디 중복", LocalDate.now(), "사용자 userid 다시 확인하세요");
-
-		return ResponseEntity.status(500).body(errorDetails); // 500 에러
-	}
+	// // 사용자 userid 중복 예외처리
+	// @ExceptionHandler(value = {SQLIntegrityConstraintViolationException.class})
+	// public ResponseEntity<ErrorDetails> errorPage(Exception e) {
+	// 	log.info("logger:사용자 userid 중복 예외처리.: {}", e.getMessage());
+	//
+	// 	ErrorDetails errorDetails =
+	// 		new ErrorDetails("아이디 중복", LocalDate.now(), "사용자 userid 다시 확인하세요");
+	//
+	// 	return ResponseEntity.status(500).body(errorDetails); // 500 에러
+	// }
 }
 
 // 에러메시지 저장 클래스

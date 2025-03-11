@@ -1,11 +1,11 @@
 package com.exam.user;
 
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.domain.Persistable;
-
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

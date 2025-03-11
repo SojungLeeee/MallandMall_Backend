@@ -26,6 +26,10 @@ repositories {
 dependencies {
 
 
+        // ✅ MariaDB JDBC 드라이버 추가 (필수)
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
+
+
     // 기타 기존 의존성 유지
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'

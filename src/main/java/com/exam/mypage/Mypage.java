@@ -19,7 +19,7 @@ import lombok.ToString;
 public class Mypage {
 
 	@Id
-	String userid;
+	String userId;
 	String username;  // 사용자 이름
 	String post;  // 주소
 	String addr1;  // 주소1

@@ -6,14 +6,14 @@ public interface UserService {
 	public void save(UserDTO dto);
 
 	// mypage
-	public UserDTO findById(String userid);
+	public UserDTO findById(String userId);
 
 	// 로그인
-	public UserDTO findByUserid(String userid);
+	public UserDTO findByuserId(String userId);
 
-	public String findUseridByNameAndEmail(String username, String email);
+	public String finduserIdByNameAndEmail(String username, String email);
 
 	//비밀번호재설정
-	public boolean resetPassword(String userid, String phoneNumber, String newPassword);
+	public boolean resetPassword(String userId, String phoneNumber, String newPassword);
 }
 

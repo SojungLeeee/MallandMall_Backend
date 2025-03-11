@@ -25,7 +25,7 @@ import lombok.ToString;
 public class UserDTO {
 
 	@NotBlank(message = "User ID 필수")
-	String userid;  // 아이디 (primary key)
+	String userId;  // 아이디 (primary key)
 
 	@NotBlank(message = "User passwd 필수")
 	String passwd;  // 비밀번호

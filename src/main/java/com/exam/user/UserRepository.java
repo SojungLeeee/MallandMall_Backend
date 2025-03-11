@@ -18,9 +18,9 @@ public interface UserRepository extends JpaRepository<User, String> {
 	    */
 
 	// 로그인 검증을 위한 쿼리 메서드
-	User findByUseridAndPasswd(String userid, String passwd);
+	User findByuserIdAndPasswd(String userId, String passwd);
 
-	User findByUseridAndPhoneNumber(String userid, String phoneNumber);
+	User findByuserIdAndPhoneNumber(String userId, String phoneNumber);
 
 	User findByUsernameAndEmail(String username, String email);
 }

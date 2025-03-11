@@ -27,12 +27,12 @@ public class MypageController {
 		Authentication authentication =
 			SecurityContextHolder.getContext().getAuthentication();
 
-		String userid = authentication.getName();
-		if (userid == null) {
+		String userId = authentication.getName();
+		if (userId == null) {
 			return ResponseEntity.status(401).body("인증되지 않은 사용자");
 		}
 
-		MypageDTO mypage = mypageService.getMypage(userid);
+		MypageDTO mypage = mypageService.getMypage(userId);
 		return ResponseEntity.ok(mypage);
 	}
 
@@ -42,12 +42,12 @@ public class MypageController {
 		Authentication authentication =
 			SecurityContextHolder.getContext().getAuthentication();
 
-		String userid = authentication.getName();
-		if (userid == null) {
+		String userId = authentication.getName();
+		if (userId == null) {
 			return ResponseEntity.status(401).body("인증되지 않은 사용자");
 		}
 
-		mypageService.updateMypage(userid, dto);
+		mypageService.updateMypage(userId, dto);
 		return ResponseEntity.ok("회원 정보가 수정되었습니다.");
 	}
 
@@ -58,12 +58,12 @@ public class MypageController {
 		Authentication authentication =
 			SecurityContextHolder.getContext().getAuthentication();
 
-		String userid = authentication.getName();
-		if (userid == null) {
+		String userId = authentication.getName();
+		if (userId == null) {
 			return ResponseEntity.status(401).body("인증되지 않은 사용자");
 		}
 
-		mypageService.deleteMypage(userid);
+		mypageService.deleteMypage(userId);
 		return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
 	}
 

@@ -16,9 +16,9 @@ public class MypageServiceImpl implements MypageService {
 	}
 
 	@Override
-	public MypageDTO getMypage(String userid) {
+	public MypageDTO getMypage(String userId) {
 
-		User user = mypageRepository.findByUserid(userid).orElse(null);
+		User user = mypageRepository.findByuserId(userId).orElse(null);
 		if (user == null) {
 			return null;
 		}
@@ -27,8 +27,8 @@ public class MypageServiceImpl implements MypageService {
 
 	@Override
 	@Transactional
-	public void updateMypage(String userid, MypageDTO dto) {
-		User user = mypageRepository.findByUserid(userid).orElse(null);
+	public void updateMypage(String userId, MypageDTO dto) {
+		User user = mypageRepository.findByuserId(userId).orElse(null);
 		if (user == null) {
 			throw new IllegalArgumentException("해당 사용자가 존재하지 않습니다.");
 		}
@@ -45,18 +45,18 @@ public class MypageServiceImpl implements MypageService {
 
 	@Override
 	@Transactional
-	public void deleteMypage(String userid) {
-		User user = mypageRepository.findByUserid(userid).orElse(null);
+	public void deleteMypage(String userId) {
+		User user = mypageRepository.findByuserId(userId).orElse(null);
 		if (user == null) {
 			throw new IllegalArgumentException("해당 사용자가 존재하지 않습니다.");
 		}
 
-		mypageRepository.deleteById(userid);
+		mypageRepository.deleteById(userId);
 	}
 
 	private MypageDTO convertToDTO(User user) {
 		return MypageDTO.builder()
-			.userid(user.getUserid())
+			.userId(user.getuserId())
 			.username(user.getUsername())
 			.post(user.getPost())
 			.addr1(user.getAddr1())

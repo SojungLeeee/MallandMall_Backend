@@ -30,17 +30,17 @@ public class JwtTokenProvider {
 	public String authenticate(Map<String, String> map) {
 		String encodedtoken = null;
 
-		String userid = map.get("userid");
+		String userId = map.get("userId");
 		String passwd = map.get("passwd");
 
-		UserDTO dto = userService.findById(userid);
+		UserDTO dto = userService.findById(userId);
 
 		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		UsernamePasswordAuthenticationToken token = null;
 		if (dto != null && passwordEncoder.matches(passwd, dto.getPasswd())) {
 
 			UserDTO new_dto = new UserDTO();
-			new_dto.setUserid(userid);
+			new_dto.setUserId(userId);
 			new_dto.setPasswd(passwd); // 1234
 			new_dto.setUsername(dto.getUsername());
 
@@ -48,11 +48,11 @@ public class JwtTokenProvider {
 			authorities.add(new SimpleGrantedAuthority("USER"));
 
 			// 다음 token 정보가 세션에 저장된다.
-			// dto 값을 사용하면 나중에 문자열로 "MemberDTO { userid:kim4832 ~"
+			// dto 값을 사용하면 나중에 문자열로 "MemberDTO { userId:kim4832 ~"
 			//			token = new UsernamePasswordAuthenticationToken(new_dto, null, authorities);
 
-			// 나중에 userid 값이 필요한데 쉽게 얻기 위해서 userid를 지정함.
-			token = new UsernamePasswordAuthenticationToken(userid, null, authorities);
+			// 나중에 userId 값이 필요한데 쉽게 얻기 위해서 userId를 지정함.
+			token = new UsernamePasswordAuthenticationToken(userId, null, authorities);
 
 			// Authentication 을 이용해서 token 생성
 			encodedtoken = tokenService.generateToken(token);

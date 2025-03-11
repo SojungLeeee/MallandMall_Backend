@@ -15,7 +15,7 @@ import lombok.ToString;
 @Builder
 public class MypageDTO {
 
-	private String userid;
+	private String userId;
 	private String username;  // 사용자 이름
 	private String passwd;
 	private String post;  // 주소

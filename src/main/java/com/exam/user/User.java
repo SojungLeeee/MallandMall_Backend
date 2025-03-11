@@ -30,7 +30,7 @@ public class User implements Persistable<String> {
 
 	@Id
 	@Column(nullable = false)
-	String userid;  // 아이디 (primary key)
+	String userId;  // 아이디 (primary key)
 
 	@Column(nullable = false)
 	String passwd;  // 비밀번호
@@ -54,7 +54,7 @@ public class User implements Persistable<String> {
 
 	@Override
 	public String getId() {
-		return userid;
+		return userId;
 	}
 
 	@Override

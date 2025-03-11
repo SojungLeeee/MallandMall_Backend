@@ -41,13 +41,13 @@ public class CustomizedResponseEntityExceptionHandler
 
 	}//end handleMethodArgumentNotValid
 
-	// 사용자 userid 중복 예외처리
+	// 사용자 userId 중복 예외처리
 	@ExceptionHandler(value = {SQLIntegrityConstraintViolationException.class, ConstraintViolationException.class})
 	public ResponseEntity<ErrorDetails> errorPage(Exception e) {
-		log.info("logger:사용자 userid 중복 예외처리.: {}", e.getMessage());
+		log.info("logger:사용자 userId 중복 예외처리.: {}", e.getMessage());
 
 		ErrorDetails errorDetails =
-			new ErrorDetails("아이디 중복", LocalDate.now(), "사용자 userid 다시 확인하세요");
+			new ErrorDetails("아이디 중복", LocalDate.now(), "사용자 userId 다시 확인하세요");
 
 		return ResponseEntity.status(500).body(errorDetails); // 500 에러
 	}

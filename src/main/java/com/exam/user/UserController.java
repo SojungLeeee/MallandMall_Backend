@@ -27,7 +27,7 @@ public class UserController {
     /*
 	 	headers : Content-Type:application/json
 	 	body :  {
-				   "userid":"llsj09",
+				   "userId":"llsj09",
 				   "passwd":"1234",
 				   "username":"이소정",
 				   "post": "당감주공",
@@ -54,9 +54,9 @@ public class UserController {
 
 	@PostMapping("/findid")
 	public ResponseEntity<String> findId(@RequestBody UserDTO dto) {
-		String userid = userService.findUseridByNameAndEmail(dto.getUsername(), dto.getEmail());
-		if (userid != null) {
-			return ResponseEntity.ok(userid);
+		String userId = userService.finduserIdByNameAndEmail(dto.getUsername(), dto.getEmail());
+		if (userId != null) {
+			return ResponseEntity.ok(userId);
 		} else {
 			return ResponseEntity.status(404).body("아이디를 찾을 수 없습니다.");
 		}
@@ -64,7 +64,7 @@ public class UserController {
 
 	@PostMapping("/reset-password")
 	public ResponseEntity<String> resetPassword(@RequestBody PasswordResetRequest request) {
-		boolean result = userService.resetPassword(request.getUserid(), request.getPhoneNumber(),
+		boolean result = userService.resetPassword(request.getUserId(), request.getPhoneNumber(),
 			request.getNewPassword());
 
 		if (result) {

@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
 	public void save(UserDTO dto) {
 		// MemberDTO --> Member 로 변환하는 작업 필요
 		User user = User.builder()
-			.userid(dto.getUserid())
+			.userId(dto.getUserId())
 			.passwd(dto.getPasswd())
 			.username(dto.getUsername())
 			.post(dto.getPost())
@@ -37,8 +37,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserDTO findById(String userid) {
-		User user = userRepository.findById(userid).orElse(null);
+	public UserDTO findById(String userId) {
+		User user = userRepository.findById(userId).orElse(null);
 		if (user == null)
 			return null;
 
@@ -47,8 +47,8 @@ public class UserServiceImpl implements UserService {
 
 	//  로그인 기능
 	@Override
-	public UserDTO findByUserid(String userid) {
-		User user = userRepository.findByUseridAndPasswd(userid, ""); // 더미 비밀번호
+	public UserDTO findByuserId(String userId) {
+		User user = userRepository.findByuserIdAndPasswd(userId, ""); // 더미 비밀번호
 		if (user == null)
 			return null;
 
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
 	//  Entity → DTO 변환 메서드
 	private UserDTO convertToDTO(User user) {
 		return UserDTO.builder()
-			.userid(user.getUserid())
+			.userId(user.getUserId())
 			.passwd(user.getPasswd()) // 비밀번호도 함께 반환
 			.username(user.getUsername())
 			.post(user.getPost())
@@ -71,18 +71,18 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public String findUseridByNameAndEmail(String username, String email) {
+	public String finduserIdByNameAndEmail(String username, String email) {
 		User user = userRepository.findByUsernameAndEmail(username, email); // repository에서 호출해야 함
 		if (user == null) {
 			throw new IllegalArgumentException("일치하는 회원 정보가 없습니다.");
 		}
-		return user.getUserid(); // 아이디 반환
+		return user.getUserId(); // 아이디 반환
 	}
 
 	@Override
 	@Transactional
-	public boolean resetPassword(String userid, String phoneNumber, String newPassword) {
-		User user = userRepository.findByUseridAndPhoneNumber(userid, phoneNumber);
+	public boolean resetPassword(String userId, String phoneNumber, String newPassword) {
+		User user = userRepository.findByuserIdAndPhoneNumber(userId, phoneNumber);
 		if (user != null) {
 			String encodedPassword = new BCryptPasswordEncoder().encode(newPassword);
 			user.setPasswd(encodedPassword); // 비밀번호 변경

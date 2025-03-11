@@ -1,8 +1,14 @@
 package com.exam.user;
 
+import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.domain.Persistable;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +24,7 @@ import lombok.ToString;
 @ToString
 @Builder
 @Entity
-public class User {
+public class User implements Persistable<String> {
 
 	@Id
 	@Column(nullable = false)
@@ -36,4 +42,17 @@ public class User {
 	String email;  // 이메일
 	String role = "USER";  // 역할, 기본값 'USER'
 
+	@CreatedDate
+	@Transient //테이블의 컬럼으로 안만들어짐, 순수하게 시간만
+	private LocalDateTime createdDate;
+
+	@Override
+	public String getId() {
+		return userid;
+	}
+
+	@Override
+	public boolean isNew() {
+		return createdDate == null;
+	}
 }

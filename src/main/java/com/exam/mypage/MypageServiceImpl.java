@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 
 import com.exam.user.User;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class MypageServiceImpl implements MypageService {
 
@@ -24,6 +26,7 @@ public class MypageServiceImpl implements MypageService {
 	}
 
 	@Override
+	@Transactional
 	public void updateMypage(String userid, MypageDTO dto) {
 		User user = mypageRepository.findByUserid(userid).orElse(null);
 		if (user == null) {
@@ -37,10 +40,11 @@ public class MypageServiceImpl implements MypageService {
 		user.setAddr1(dto.getAddr1());
 		user.setAddr2(dto.getAddr2());
 
-		mypageRepository.save(user);
+		//mypageRepository.save(user);
 	}
 
 	@Override
+	@Transactional
 	public void deleteMypage(String userid) {
 		User user = mypageRepository.findByUserid(userid).orElse(null);
 		if (user == null) {

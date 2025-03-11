@@ -1,12 +1,16 @@
 package com.exam.user;
 
-import java.time.LocalDate;
 
-import org.hibernate.annotations.CreationTimestamp;
+import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.domain.Persistable;
+
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,7 +26,7 @@ import lombok.ToString;
 @ToString
 @Builder
 @Entity
-public class User {
+public class User implements Persistable<String> {
 
 	@Id
 	@Column(nullable = false)
@@ -44,4 +48,17 @@ public class User {
 	@Column(updatable = false)   //저장할때만 자동저장O 수정할때는 저장 X 을위한것
 	LocalDate createDate;   //저장할때만 자동저장O 수정할때는 저장 X
 
+	@CreatedDate
+	@Transient //테이블의 컬럼으로 안만들어짐, 순수하게 시간만
+	private LocalDateTime createdDate;
+
+	@Override
+	public String getId() {
+		return userid;
+	}
+
+	@Override
+	public boolean isNew() {
+		return createdDate == null;
+	}
 }

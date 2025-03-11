@@ -10,4 +10,10 @@ public interface UserService {
 
 	// 로그인
 	public UserDTO findByUserid(String userid);
+
+	public String findUseridByNameAndEmail(String username, String email);
+
+	//비밀번호재설정
+	public boolean resetPassword(String userid, String phoneNumber, String newPassword);
 }
+

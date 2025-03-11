@@ -56,7 +56,7 @@ public class MypageServiceImpl implements MypageService {
 
 	private MypageDTO convertToDTO(User user) {
 		return MypageDTO.builder()
-			.userId(user.getuserId())
+			.userId(user.getUserId())
 			.username(user.getUsername())
 			.post(user.getPost())
 			.addr1(user.getAddr1())

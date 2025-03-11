@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import org.apache.ibatis.type.Alias;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
@@ -40,8 +41,15 @@ public class UserDTO {
 	String email;  // 이메일
 
 	String role = "USER";  // 역할, 기본값 'USER'
+	String newPassword;
 
 	@CreationTimestamp
 	@Column(updatable = false) //저장할때만 자동저장O 수정할때는 저장 X 을위한것
 	LocalDate createDate; //저장할때만 자동저장O 수정할때는 저장 X
+
+	public void updatePassword(String newPassword) {
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		this.passwd = encoder.encode(newPassword);  // 비밀번호 암호화 후 업데이트
+	}
 }
+

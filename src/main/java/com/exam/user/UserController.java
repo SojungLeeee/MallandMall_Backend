@@ -52,4 +52,28 @@ public class UserController {
 		return ResponseEntity.created(null).body(dto);  // 201 상태코드 반환됨.
 	}
 
+	@PostMapping("/findid")
+	public ResponseEntity<String> findId(@RequestBody UserDTO dto) {
+		String userid = userService.findUseridByNameAndEmail(dto.getUsername(), dto.getEmail());
+		if (userid != null) {
+			return ResponseEntity.ok(userid);
+		} else {
+			return ResponseEntity.status(404).body("아이디를 찾을 수 없습니다.");
+		}
+	}
+
+	@PostMapping("/reset-password")
+	public ResponseEntity<String> resetPassword(@RequestBody PasswordResetRequest request) {
+		boolean result = userService.resetPassword(request.getUserid(), request.getPhoneNumber(),
+			request.getNewPassword());
+
+		if (result) {
+			return ResponseEntity.ok("비밀번호가 성공적으로 재설정되었습니다.");
+		} else {
+			return ResponseEntity.status(404).body("아이디와 전화번호가 일치하는 회원이 없습니다.");
+		}
+	}
 }
+
+
+

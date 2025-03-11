@@ -8,7 +8,6 @@ import jakarta.transaction.Transactional;
 @Service
 public class UserServiceImpl implements UserService {
 
-
 	UserService userService;
 	//repository 생성자주입
 	UserRepository userRepository;
@@ -36,8 +35,6 @@ public class UserServiceImpl implements UserService {
 
 		userRepository.save(user);
 	}
-
-
 
 	@Override
 	public UserDTO findById(String userid) {
@@ -83,18 +80,17 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	@Transactional
 	public boolean resetPassword(String userid, String phoneNumber, String newPassword) {
 		User user = userRepository.findByUseridAndPhoneNumber(userid, phoneNumber);
-		if (user == null) {
-			return false; // 일치하는 정보가 없으면 false 반환
+		if (user != null) {
+			String encodedPassword = new BCryptPasswordEncoder().encode(newPassword);
+			user.setPasswd(encodedPassword); // 비밀번호 변경
+			//userRepository.save(user);
+			return true; // 변경 성공
 		}
 
-		String encodedPassword = new BCryptPasswordEncoder().encode(newPassword);
-		user.setPasswd(encodedPassword); // 비밀번호 변경
-		userRepository.save(user);
-
-		return true; // 변경 성공
+		return false; // 일치하는 정보가 없으면 false 반환
 	}
-
 
 }

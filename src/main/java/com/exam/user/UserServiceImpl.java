@@ -71,12 +71,16 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public String findByUserNameAndEmail(String userName, String email) {
-		User user = userRepository.findByUserNameAndEmail(userName, email); // repository에서 호출해야 함
+	public UserDTO findByUserNameAndEmail(String userName, String email) {
+		User user = userRepository.findByUserNameAndEmail(userName, email); // repository에서 호출
 		if (user == null) {
 			throw new IllegalArgumentException("일치하는 회원 정보가 없습니다.");
 		}
-		return user.getUserId(); // 아이디 반환
+		// UserDTO를 반환, 필요한 필드만 설정
+		return UserDTO.builder()
+			.userId(user.getUserId())
+			.createDate(user.getCreateDate())  // createDate 포함
+			.build();
 	}
 
 	@Override

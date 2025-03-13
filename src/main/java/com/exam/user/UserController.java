@@ -53,12 +53,14 @@ public class UserController {
 	}
 
 	@PostMapping("/findid")
-	public ResponseEntity<String> findId(@RequestBody UserDTO dto) {
-		String userId = userService.findByUserNameAndEmail(dto.getUserName(), dto.getEmail());
-		if (userId != null) {
-			return ResponseEntity.ok(userId);
+	public ResponseEntity<UserDTO> findId(@RequestBody UserDTO dto) {
+		UserDTO userDTO = userService.findByUserNameAndEmail(dto.getUserName(), dto.getEmail());
+
+		if (userDTO != null) {
+			// userId와 createDate를 포함한 UserDTO를 반환
+			return ResponseEntity.ok(userDTO);
 		} else {
-			return ResponseEntity.status(404).body("아이디를 찾을 수 없습니다.");
+			return ResponseEntity.status(404).body(null);  // 404로 사용자 찾을 수 없음을 전달
 		}
 	}
 

@@ -31,7 +31,7 @@ public class UserDTO {
 	String password;  // 비밀번호
 
 	@NotBlank(message = "User username 필수")
-	String username;  // 사용자 이름
+	String userName;  // 사용자 이름
 
 	String post;  // 주소
 	String addr1;  // 주소1

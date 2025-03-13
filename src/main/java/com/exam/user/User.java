@@ -36,7 +36,7 @@ public class User implements Persistable<String> {
 	String password;  // 비밀번호
 
 	@Column(nullable = false)
-	String username;  // 사용자 이름
+	String userName;  // 사용자 이름
 	String post;  // 주소
 	String addr1;  // 주소1
 	String addr2;  // 주소2

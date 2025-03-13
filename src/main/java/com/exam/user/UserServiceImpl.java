@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
 		User user = User.builder()
 			.userId(dto.getUserId())
 			.password(dto.getPassword())
-			.username(dto.getUsername())
+			.userName(dto.getUserName())
 			.post(dto.getPost())
 			.addr1(dto.getAddr1())
 			.addr2(dto.getAddr2())
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
 		return UserDTO.builder()
 			.userId(user.getUserId())
 			.password(user.getPassword()) // 비밀번호도 함께 반환
-			.username(user.getUsername())
+			.userName(user.getUserName())
 			.post(user.getPost())
 			.addr1(user.getAddr1())
 			.addr2(user.getAddr2())
@@ -71,8 +71,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public String finduserIdByNameAndEmail(String username, String email) {
-		User user = userRepository.findByUsernameAndEmail(username, email); // repository에서 호출해야 함
+	public String findByUserNameAndEmail(String userName, String email) {
+		User user = userRepository.findByUserNameAndEmail(userName, email); // repository에서 호출해야 함
 		if (user == null) {
 			throw new IllegalArgumentException("일치하는 회원 정보가 없습니다.");
 		}

@@ -42,7 +42,7 @@ public class JwtTokenProvider {
 			UserDTO new_dto = new UserDTO();
 			new_dto.setUserId(userId);
 			new_dto.setNewPassword(password); // 1234
-			new_dto.setUsername(dto.getUsername());
+			new_dto.setUserName(dto.getUserName());
 
 			List<GrantedAuthority> authorities = new ArrayList<>();
 			authorities.add(new SimpleGrantedAuthority("USER"));

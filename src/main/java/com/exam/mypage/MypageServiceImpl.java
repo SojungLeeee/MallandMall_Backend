@@ -33,7 +33,7 @@ public class MypageServiceImpl implements MypageService {
 			throw new IllegalArgumentException("해당 사용자가 존재하지 않습니다.");
 		}
 
-		user.setUsername(dto.getUsername());
+		user.setUserName(dto.getUsername());
 		user.setPhoneNumber(dto.getPhoneNumber());
 		user.setEmail(dto.getEmail());
 		user.setPost(dto.getPost());
@@ -57,7 +57,7 @@ public class MypageServiceImpl implements MypageService {
 	private MypageDTO convertToDTO(User user) {
 		return MypageDTO.builder()
 			.userId(user.getUserId())
-			.username(user.getUsername())
+			.username(user.getUserName())
 			.post(user.getPost())
 			.addr1(user.getAddr1())
 			.addr2(user.getAddr2())

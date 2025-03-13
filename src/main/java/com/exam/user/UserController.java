@@ -54,7 +54,7 @@ public class UserController {
 
 	@PostMapping("/findid")
 	public ResponseEntity<String> findId(@RequestBody UserDTO dto) {
-		String userId = userService.finduserIdByNameAndEmail(dto.getUsername(), dto.getEmail());
+		String userId = userService.findByUserNameAndEmail(dto.getUserName(), dto.getEmail());
 		if (userId != null) {
 			return ResponseEntity.ok(userId);
 		} else {
@@ -74,6 +74,3 @@ public class UserController {
 		}
 	}
 }
-
-
-

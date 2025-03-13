@@ -11,9 +11,8 @@ public interface UserService {
 	// 로그인
 	public UserDTO findByuserId(String userId);
 
-	public String finduserIdByNameAndEmail(String username, String email);
+	public String findByUserNameAndEmail(String userName, String email);
 
 	//비밀번호재설정
 	public boolean resetPassword(String userId, String phoneNumber, String newPassword);
 }
-

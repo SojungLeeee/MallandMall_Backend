@@ -28,7 +28,7 @@ public class UserDTO {
 	String userId;  // 아이디 (primary key)
 
 	@NotBlank(message = "User passwd 필수")
-	String passwd;  // 비밀번호
+	String password;  // 비밀번호
 
 	@NotBlank(message = "User username 필수")
 	String username;  // 사용자 이름
@@ -49,7 +49,7 @@ public class UserDTO {
 
 	public void updatePassword(String newPassword) {
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		this.passwd = encoder.encode(newPassword);  // 비밀번호 암호화 후 업데이트
+		this.password = encoder.encode(newPassword);  // 비밀번호 암호화 후 업데이트
 	}
 }
 

@@ -31,17 +31,17 @@ public class JwtTokenProvider {
 		String encodedtoken = null;
 
 		String userId = map.get("userId");
-		String passwd = map.get("passwd");
+		String password = map.get("password");
 
 		UserDTO dto = userService.findById(userId);
 
 		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		UsernamePasswordAuthenticationToken token = null;
-		if (dto != null && passwordEncoder.matches(passwd, dto.getPasswd())) {
+		if (dto != null && passwordEncoder.matches(password, dto.getPassword())) {
 
 			UserDTO new_dto = new UserDTO();
 			new_dto.setUserId(userId);
-			new_dto.setPasswd(passwd); // 1234
+			new_dto.setNewPassword(password); // 1234
 			new_dto.setUsername(dto.getUsername());
 
 			List<GrantedAuthority> authorities = new ArrayList<>();

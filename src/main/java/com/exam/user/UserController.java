@@ -41,12 +41,12 @@ public class UserController {
 
 	@PostMapping("/signup")
 	public ResponseEntity<UserDTO> signup(@Valid @RequestBody UserDTO dto) {
-		log.info("비번 암호화전: {}", dto.getPasswd());
+		log.info("비번 암호화전: {}", dto.getPassword());
 		//비번을 암호화 해야됨.
-		String encodedPW = new BCryptPasswordEncoder().encode(dto.getPasswd());
+		String encodedPW = new BCryptPasswordEncoder().encode(dto.getPassword());
 		log.info("비번 암호화후: {}", encodedPW);
 
-		dto.setPasswd(encodedPW);
+		dto.setPassword(encodedPW);
 		userService.save(dto);
 
 		return ResponseEntity.created(null).body(dto);  // 201 상태코드 반환됨.

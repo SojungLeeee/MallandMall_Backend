@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService {
 		// MemberDTO --> Member 로 변환하는 작업 필요
 		User user = User.builder()
 			.userId(dto.getUserId())
-			.passwd(dto.getPasswd())
+			.password(dto.getPassword())
 			.username(dto.getUsername())
 			.post(dto.getPost())
 			.addr1(dto.getAddr1())
@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
 	//  로그인 기능
 	@Override
 	public UserDTO findByuserId(String userId) {
-		User user = userRepository.findByuserIdAndPasswd(userId, ""); // 더미 비밀번호
+		User user = userRepository.findByuserIdAndPassword(userId, ""); // 더미 비밀번호
 		if (user == null)
 			return null;
 
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
 	private UserDTO convertToDTO(User user) {
 		return UserDTO.builder()
 			.userId(user.getUserId())
-			.passwd(user.getPasswd()) // 비밀번호도 함께 반환
+			.password(user.getPassword()) // 비밀번호도 함께 반환
 			.username(user.getUsername())
 			.post(user.getPost())
 			.addr1(user.getAddr1())
@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserService {
 		User user = userRepository.findByuserIdAndPhoneNumber(userId, phoneNumber);
 		if (user != null) {
 			String encodedPassword = new BCryptPasswordEncoder().encode(newPassword);
-			user.setPasswd(encodedPassword); // 비밀번호 변경
+			user.setPassword(encodedPassword); // 비밀번호 변경
 			//userRepository.save(user);
 			return true; // 변경 성공
 		}

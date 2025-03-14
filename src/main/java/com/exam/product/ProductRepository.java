@@ -8,4 +8,5 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 
 	List<Product> findByCategory(String category);
 
+	List<Product> findByProductName(String productName);  // 상품 이름으로 검색
 }

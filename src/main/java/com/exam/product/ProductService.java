@@ -8,4 +8,7 @@ public interface ProductService {
 	ProductDTO getProductByCode(String productCode); // 특정 상품 조회
 
 	List<ProductDTO> getProductsByCategory(String category);
+
+	List<ProductDTO> getProductsByName(String productName); // 상품 이름으로 검색
+
 }

@@ -38,4 +38,11 @@ public class ProductController {
 		List<ProductDTO> products = productService.getProductsByCategory(category);
 		return ResponseEntity.ok(products);
 	}
+
+	@GetMapping("/search/{productName}")
+	public ResponseEntity<List<ProductDTO>> searchProductsByName(@PathVariable String productName) {
+		List<ProductDTO> products = productService.getProductsByName(productName);
+		return (products.isEmpty()) ? ResponseEntity.noContent().build() : ResponseEntity.ok(products);
+	}
+
 }

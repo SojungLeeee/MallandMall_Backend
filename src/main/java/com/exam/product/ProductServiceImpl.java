@@ -1,8 +1,9 @@
 package com.exam.product;
 
-import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
 
 import com.exam.review.ReviewRepository;
 
@@ -12,7 +13,7 @@ public class ProductServiceImpl implements ProductService {
 	private final ProductRepository productRepository;
 	private final ReviewRepository reviewRepository;
 
-	public ProductServiceImpl(ProductRepository productRepository,ReviewRepository reviewRepository ) {
+	public ProductServiceImpl(ProductRepository productRepository, ReviewRepository reviewRepository) {
 		this.productRepository = productRepository;
 		this.reviewRepository = reviewRepository;
 	}
@@ -37,6 +38,16 @@ public class ProductServiceImpl implements ProductService {
 		}
 		double avgRating = reviewRepository.getAverageRating(productCode); // ⭐ 평균 별점 가져오기
 		return convertToDTO(product, avgRating);
+	}
+
+	@Override
+	public List<ProductDTO> getProductsByCategory(String category) {
+		List<Product> products = productRepository.findByCategory(category);
+
+		return products.stream().map(product -> {
+			double avgRating = reviewRepository.getAverageRating(product.getProductCode()); //  평균 별점 가져오기
+			return convertToDTO(product, avgRating);
+		}).collect(Collectors.toList());
 	}
 
 	// entity 에서 dto로 만들기

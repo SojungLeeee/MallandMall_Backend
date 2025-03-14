@@ -1,9 +1,12 @@
 package com.exam.product;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/product")
@@ -27,5 +30,12 @@ public class ProductController {
 	public ResponseEntity<ProductDTO> getProductDetail(@PathVariable String productCode) {
 		ProductDTO product = productService.getProductByCode(productCode);
 		return (product != null) ? ResponseEntity.ok(product) : ResponseEntity.notFound().build();
+	}
+
+	//카테고리별 상품 조회
+	@GetMapping("/{category}")
+	public ResponseEntity<List<ProductDTO>> getCategoryProducts(@PathVariable String category) {
+		List<ProductDTO> products = productService.getProductsByCategory(category);
+		return ResponseEntity.ok(products);
 	}
 }

@@ -24,12 +24,12 @@ public class ProductServiceImpl implements ProductService {
 		List<Product> products = productRepository.findAll();
 
 		return products.stream().map(product -> {
-			double avgRating = reviewRepository.getAverageRating(product.getProductCode()); //  평균 별점 가져오기
+			double avgRating = reviewRepository.getAverageRating(product.getProductCode()); // 평균 별점 가져오기
 			return convertToDTO(product, avgRating);
 		}).collect(Collectors.toList());
 	}
 
-	// 상품 하나 조회하기잇
+	// 상품 하나 조회하기
 	@Override
 	public ProductDTO getProductByCode(String productCode) {
 		Product product = productRepository.findById(productCode).orElse(null);
@@ -45,12 +45,12 @@ public class ProductServiceImpl implements ProductService {
 		List<Product> products = productRepository.findByCategory(category);
 
 		return products.stream().map(product -> {
-			double avgRating = reviewRepository.getAverageRating(product.getProductCode()); //  평균 별점 가져오기
+			double avgRating = reviewRepository.getAverageRating(product.getProductCode()); // 평균 별점 가져오기
 			return convertToDTO(product, avgRating);
 		}).collect(Collectors.toList());
 	}
 
-	// entity 에서 dto로 만들기
+	// entity에서 dto로 만들기
 	private ProductDTO convertToDTO(Product product, double avgRating) {
 		return ProductDTO.builder()
 			.productCode(product.getProductCode())
@@ -59,7 +59,18 @@ public class ProductServiceImpl implements ProductService {
 			.description(product.getDescription())
 			.price(product.getPrice())
 			.image(product.getImage())
-			.averageRating(avgRating) //   별점 추가 (이건 db에는 없는거임)
+			.averageRating(avgRating) // 별점 추가 (이건 db에는 없는 거임)
 			.build();
+	}
+
+	@Override
+	public List<ProductDTO> getProductsByName(String productName) {
+		// 상품 이름으로 검색 로직
+		List<Product> products = productRepository.findByProductName(productName);
+
+		return products.stream().map(product -> {
+			double avgRating = reviewRepository.getAverageRating(product.getProductCode()); // 평균 별점 가져오기
+			return convertToDTO(product, avgRating);
+		}).collect(Collectors.toList());
 	}
 }

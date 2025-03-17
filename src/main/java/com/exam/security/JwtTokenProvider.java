@@ -27,7 +27,8 @@ public class JwtTokenProvider {
 		this.tokenService = tokenService;
 	}
 
-	public String authenticate(Map<String, String> map) {
+	public JwtTokenResponse authenticate(Map<String, String> map) {
+
 		String encodedtoken = null;
 
 		String userId = map.get("userId");
@@ -44,8 +45,10 @@ public class JwtTokenProvider {
 			new_dto.setNewPassword(password); // 1234
 			new_dto.setUserName(dto.getUserName());
 
+			new_dto.setRole(dto.getRole()); // Role 추가
+
 			List<GrantedAuthority> authorities = new ArrayList<>();
-			authorities.add(new SimpleGrantedAuthority("USER"));
+			authorities.add(new SimpleGrantedAuthority(dto.getRole().toString()));  // dto.getRole()을 사용
 
 			// 다음 token 정보가 세션에 저장된다.
 			// dto 값을 사용하면 나중에 문자열로 "MemberDTO { userId:kim4832 ~"
@@ -59,6 +62,7 @@ public class JwtTokenProvider {
 
 		}//end if
 
-		return encodedtoken;
+		return new JwtTokenResponse(encodedtoken, userId, dto.getRole().toString());
+
 	}
 }

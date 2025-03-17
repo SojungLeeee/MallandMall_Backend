@@ -47,16 +47,13 @@ public class AuthenticationController {
 	@PostMapping("/authenticate")
 	public ResponseEntity<JwtTokenResponse> authenticate(@RequestBody Map<String, String> map) {
 
-		String token = tokenProvider.authenticate(map); //jwt 토큰 생성
+		JwtTokenResponse token = tokenProvider.authenticate(map); //jwt 토큰 생성
 
 		if (token != null) { // 로그인 성공시 jwt 토큰을 json 응답으로 반환
-
-			JwtTokenResponse response =
-				new JwtTokenResponse(token, map.get("userId"));
-
-			return ResponseEntity.status(200).body(response);
+			return ResponseEntity.status(200).body(token);
 		} else {
-			return new ResponseEntity("로그인 실패", HttpStatus.BAD_REQUEST);  // 로그인 실패시 400 반환
+			JwtTokenResponse failedResponse = new JwtTokenResponse(null, map.get("userId"), "ROLE_NONE");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(failedResponse);
 		}
 	}
 

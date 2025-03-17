@@ -1,5 +1,10 @@
 package com.exam.mypage;
 
+import com.exam.user.Role;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,5 +28,7 @@ public class MypageDTO {
 	private String addr2;  // 주소2
 	private String phoneNumber;  // 전화번호
 	private String email;  // 이메일
-	private String role;
+	@Enumerated(EnumType.STRING)  // Enum 값을 String으로 저장
+	@Column(nullable = false)
+	Role role;
 }

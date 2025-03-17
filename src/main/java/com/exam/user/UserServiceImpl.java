@@ -9,7 +9,9 @@ import jakarta.transaction.Transactional;
 public class UserServiceImpl implements UserService {
 
 	UserService userService;
+
 	//repository 생성자주입
+
 	UserRepository userRepository;
 
 	public UserServiceImpl(UserRepository userRepository) {
@@ -21,6 +23,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public void save(UserDTO dto) {
 		// MemberDTO --> Member 로 변환하는 작업 필요
+		// UserDTO -> User 변환
 		User user = User.builder()
 			.userId(dto.getUserId())
 			.password(dto.getPassword())
@@ -30,7 +33,7 @@ public class UserServiceImpl implements UserService {
 			.addr2(dto.getAddr2())
 			.phoneNumber(dto.getPhoneNumber())
 			.email(dto.getEmail())
-			.role(dto.getRole())
+			.role(dto.getRole())  // Role Enum을 바로 사용
 			.build();
 
 		userRepository.save(user);
@@ -55,7 +58,7 @@ public class UserServiceImpl implements UserService {
 		return convertToDTO(user);
 	}
 
-	//  Entity → DTO 변환 메서드
+	// Entity → DTO 변환 메서드
 	private UserDTO convertToDTO(User user) {
 		return UserDTO.builder()
 			.userId(user.getUserId())
@@ -66,17 +69,16 @@ public class UserServiceImpl implements UserService {
 			.addr2(user.getAddr2())
 			.phoneNumber(user.getPhoneNumber())
 			.email(user.getEmail())
-			.role(user.getRole())
+			.role(user.getRole())  // Role Enum 값을 그대로 사용
 			.build();
 	}
 
 	@Override
 	public UserDTO findByUserNameAndEmail(String userName, String email) {
-		User user = userRepository.findByUserNameAndEmail(userName, email); // repository에서 호출
+		User user = userRepository.findByUserNameAndEmail(userName, email);
 		if (user == null) {
 			throw new IllegalArgumentException("일치하는 회원 정보가 없습니다.");
 		}
-		// UserDTO를 반환, 필요한 필드만 설정
 		return UserDTO.builder()
 			.userId(user.getUserId())
 			.createDate(user.getCreateDate())  // createDate 포함

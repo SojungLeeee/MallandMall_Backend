@@ -24,6 +24,7 @@ public class UserController {
 		return ResponseEntity.status(200).body("home"); // 200 OK 상태 코드와 함께 "home" 반환
 	}
 
+
     /*
 	 	headers : Content-Type:application/json
 	 	body :  {
@@ -43,6 +44,7 @@ public class UserController {
 	public ResponseEntity<UserDTO> signup(@Valid @RequestBody UserDTO dto) {
 		log.info("비번 암호화전: {}", dto.getPassword());
 		//비번을 암호화 해야됨.
+
 		String encodedPW = new BCryptPasswordEncoder().encode(dto.getPassword());
 		log.info("비번 암호화후: {}", encodedPW);
 
@@ -52,6 +54,7 @@ public class UserController {
 		return ResponseEntity.created(null).body(dto);  // 201 상태코드 반환됨.
 	}
 
+	// ID 찾기
 	@PostMapping("/findid")
 	public ResponseEntity<UserDTO> findId(@RequestBody UserDTO dto) {
 		UserDTO userDTO = userService.findByUserNameAndEmail(dto.getUserName(), dto.getEmail());
@@ -75,4 +78,6 @@ public class UserController {
 			return ResponseEntity.status(404).body("아이디와 전화번호가 일치하는 회원이 없습니다.");
 		}
 	}
+
 }
+

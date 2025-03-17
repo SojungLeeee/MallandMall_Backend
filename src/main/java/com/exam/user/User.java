@@ -9,6 +9,8 @@ import org.springframework.data.domain.Persistable;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
@@ -42,7 +44,10 @@ public class User implements Persistable<String> {
 	String addr2;  // 주소2
 	String phoneNumber;  // 전화번호
 	String email;  // 이메일
-	String role = "USER";  // 역할, 기본값 'USER'
+
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	Role role = Role.USER;   // 역할, 기본값 'USER'
 
 	@Transient
 	String newPassword;

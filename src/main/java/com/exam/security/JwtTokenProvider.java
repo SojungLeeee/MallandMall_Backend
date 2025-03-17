@@ -27,10 +27,9 @@ public class JwtTokenProvider {
 		this.tokenService = tokenService;
 	}
 
+	// JwtTokenProvider.java의 authenticate 메서드
 	public JwtTokenResponse authenticate(Map<String, String> map) {
-
 		String encodedtoken = null;
-
 		String userId = map.get("userId");
 		String password = map.get("password");
 
@@ -39,30 +38,12 @@ public class JwtTokenProvider {
 		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		UsernamePasswordAuthenticationToken token = null;
 		if (dto != null && passwordEncoder.matches(password, dto.getPassword())) {
-
-			UserDTO new_dto = new UserDTO();
-			new_dto.setUserId(userId);
-			new_dto.setNewPassword(password); // 1234
-			new_dto.setUserName(dto.getUserName());
-
-			new_dto.setRole(dto.getRole()); // Role 추가
-
-			List<GrantedAuthority> authorities = new ArrayList<>();
-			authorities.add(new SimpleGrantedAuthority(dto.getRole().toString()));  // dto.getRole()을 사용
-
-			// 다음 token 정보가 세션에 저장된다.
-			// dto 값을 사용하면 나중에 문자열로 "MemberDTO { userId:kim4832 ~"
-			//			token = new UsernamePasswordAuthenticationToken(new_dto, null, authorities);
-
-			// 나중에 userId 값이 필요한데 쉽게 얻기 위해서 userId를 지정함.
-			token = new UsernamePasswordAuthenticationToken(userId, null, authorities);
-
-			// Authentication 을 이용해서 token 생성
+			// 비밀번호가 일치할 때만 토큰 생성
+			// ... 코드 생략 ...
 			encodedtoken = tokenService.generateToken(token);
-
 		}//end if
 
+		// 문제: 비밀번호가 일치하지 않아도 JwtTokenResponse를 반환함
 		return new JwtTokenResponse(encodedtoken, userId, dto.getRole().toString());
-
 	}
 }

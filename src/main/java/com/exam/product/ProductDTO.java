@@ -1,5 +1,7 @@
 package com.exam.product;
 
+import org.apache.ibatis.type.Alias;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,6 +15,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @Builder
+@Alias("productDTO")
 public class ProductDTO {
 
 	private String productCode;

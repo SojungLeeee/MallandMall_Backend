@@ -39,15 +39,15 @@ public class AdminController {
 	}
 
 	@DeleteMapping("/deleteProductCode/{productCode}")
-	public ResponseEntity<ProductDTO> deleteProduct(@RequestBody String productCode) {
+	public ResponseEntity<ProductDTO> deleteProduct(@PathVariable String productCode) {
 		adminService.deleteProduct(productCode);
 		return ResponseEntity.noContent().build();
 	}
 
-	@PutMapping("/updateProductCode")
-	public ResponseEntity<ProductDTO> updateProduct(@PathVariable String productName,
+	@PutMapping("/updateProductCode/{productCode}")
+	public ResponseEntity<ProductDTO> updateProduct(@PathVariable String productCode,
 		@RequestBody ProductDTO productDTO) {
-		adminService.updateProduct(productName, productDTO);
+		adminService.updateProduct(productCode, productDTO);
 		return ResponseEntity.status(201).body(productDTO); //201
 	}
 

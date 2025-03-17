@@ -27,7 +27,6 @@ public class JwtTokenProvider {
 		this.tokenService = tokenService;
 	}
 
-	// JwtTokenProvider.java의 authenticate 메서드
 	public JwtTokenResponse authenticate(Map<String, String> map) {
 		String encodedtoken = null;
 		String userId = map.get("userId");

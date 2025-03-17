@@ -66,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public List<ProductDTO> getProductsByName(String productName) {
 		// 상품 이름으로 검색 로직
-		List<Product> products = productRepository.findByProductName(productName);
+		List<Product> products = productRepository.findByProductNameContaining(productName);
 
 		return products.stream().map(product -> {
 			double avgRating = reviewRepository.getAverageRating(product.getProductCode()); // 평균 별점 가져오기

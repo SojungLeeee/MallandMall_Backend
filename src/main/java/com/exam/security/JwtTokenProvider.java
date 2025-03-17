@@ -34,15 +34,32 @@ public class JwtTokenProvider {
 
 		UserDTO dto = userService.findById(userId);
 
+		// 사용자가 존재하지 않는 경우
+		if (dto == null) {
+			return null; // 또는 예외 발생
+		}
+
 		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		UsernamePasswordAuthenticationToken token = null;
-		if (dto != null && passwordEncoder.matches(password, dto.getPassword())) {
-			// 비밀번호가 일치할 때만 토큰 생성
-			// ... 코드 생략 ...
-			encodedtoken = tokenService.generateToken(token);
-		}//end if
 
-		// 문제: 비밀번호가 일치하지 않아도 JwtTokenResponse를 반환함
-		return new JwtTokenResponse(encodedtoken, userId, dto.getRole().toString());
+		if (passwordEncoder.matches(password, dto.getPassword())) {
+			// 비밀번호가 일치할 때만 토큰 생성 및 응답 반환
+			UserDTO new_dto = new UserDTO();
+			new_dto.setUserId(userId);
+			new_dto.setNewPassword(password);
+			new_dto.setUserName(dto.getUserName());
+			new_dto.setRole(dto.getRole());
+
+			List<GrantedAuthority> authorities = new ArrayList<>();
+			authorities.add(new SimpleGrantedAuthority(dto.getRole().toString()));
+
+			token = new UsernamePasswordAuthenticationToken(userId, null, authorities);
+			encodedtoken = tokenService.generateToken(token);
+
+			return new JwtTokenResponse(encodedtoken, userId, dto.getRole().toString());
+		} else {
+			// 비밀번호가 일치하지 않는 경우
+			return null; // 또는 예외 발생
+		}
 	}
 }

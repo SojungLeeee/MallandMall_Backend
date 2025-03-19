@@ -8,7 +8,7 @@ public interface UserService {
 	// mypage
 	public UserDTO findById(String userId);
 
-	// 로그인
+	// 로그인 아이디 중복 확인
 	public UserDTO findByuserId(String userId);
 
 	public UserDTO findByUserNameAndEmail(String userName, String email);

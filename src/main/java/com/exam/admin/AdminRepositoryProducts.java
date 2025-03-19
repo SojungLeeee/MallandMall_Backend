@@ -1,11 +1,8 @@
 package com.exam.admin;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import com.exam.product.Product;
 
@@ -34,7 +31,4 @@ public interface AdminRepositoryProducts extends JpaRepository<Product, String> 
 	// productCode를 기준으로 상품을 조회하는 메서드
 	Optional<Product> findByProductCode(String productCode);
 
-	@Query("select p.productCode as productCode, p.category as category, "
-		+ "p.productName as productName, p.price as price from Product as p")
-	List<Map> findAllProductCodeAndCategoryAndProductNameAndPrice();
 }

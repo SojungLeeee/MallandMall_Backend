@@ -12,6 +12,7 @@ import com.exam.inventory.Inventory;
 import com.exam.inventory.InventoryRepository;
 import com.exam.product.Product;
 import com.exam.product.ProductDTO;
+import com.exam.product.ProductRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -22,15 +23,18 @@ public class AdminServiceImpl implements AdminService {
 	AdminRepositoryProducts adminRepositoryProducts;
 	InventoryRepository inventoryRepository;
 	BranchRepository branchRepository;
+	ProductRepository productRepository;
 
 	public AdminServiceImpl(AdminRepositoryGoods adminRepositoryGoods,
 		AdminRepositoryProducts adminRepositoryProducts,
 		InventoryRepository inventoryRepository,
-		BranchRepository branchRepository) {
+		BranchRepository branchRepository,
+		ProductRepository productRepository) {
 		this.adminRepositoryGoods = adminRepositoryGoods;
 		this.adminRepositoryProducts = adminRepositoryProducts;
 		this.inventoryRepository = inventoryRepository;
 		this.branchRepository = branchRepository;
+		this.productRepository = productRepository;
 	}
 
 	@Override
@@ -151,6 +155,15 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	@Transactional
 	public void addProduct(ProductDTO productDTO) {
+
+		// 1. productCode가 존재하는지 확인
+		Optional<Product> dto = productRepository.findById(productDTO.getProductCode());
+
+		// productCode가 존재하면, primary key 제약 조건 오류 발생
+		if (dto.isPresent()) {
+			throw new RuntimeException("이미 존재하는 productCode 입니다. 다른 productCode 입력해주세요." + productDTO.getProductCode());
+		}
+
 		Product product = Product.builder()
 			.productCode(productDTO.getProductCode())
 			.category(productDTO.getCategory())

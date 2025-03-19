@@ -1,5 +1,7 @@
 package com.exam.user;
 
+import java.util.Optional;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,13 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public void save(UserDTO dto) {
+		// 1. 지점이 존재하는지 확인
+		Optional<User> userDTO = userRepository.findById(dto.getUserId());
+
+		// 아이디가 이미 존재하면 primary key 제약 조건 오류 발생
+		if (userDTO.isPresent()) {
+			throw new RuntimeException("이미 존재하는 userId 입니다. 다른 userId를 입력해주세요." + dto.getUserId());
+		}
 		// MemberDTO --> Member 로 변환하는 작업 필요
 		// UserDTO -> User 변환
 		User user = User.builder()

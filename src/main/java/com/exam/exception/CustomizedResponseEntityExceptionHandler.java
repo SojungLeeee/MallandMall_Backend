@@ -55,12 +55,13 @@ public class CustomizedResponseEntityExceptionHandler
 		ErrorDetails errorDetails;
 
 		// 메시지에 "user.PRIMARY"가 포함되어 있으면 사용자 관련 에러
-		if (message.contains("user.PRIMARY")) {
-			errorDetails = new ErrorDetails("아이디 중복", LocalDate.now(), "사용자 userId를 다시 확인하세요");
+		if (message.contains("존재하는 userId")) {
+			errorDetails = new ErrorDetails("이미 존재하는 userId", LocalDate.now(), "이미 존재하는 userId입니다. 다른 userId를 입력해주세요.");
 		}
 		// 메시지에 "products.PRIMARY"가 포함되어 있으면 상품 관련 에러
-		else if (message.contains("products.PRIMARY")) {
-			errorDetails = new ErrorDetails("상품 중복", LocalDate.now(), "상품 productCode 가 중복되었습니다. 다시 확인하세요");
+		else if (message.contains("존재하는 productCode")) {
+			errorDetails = new ErrorDetails("이미 존재하는 productCode", LocalDate.now(),
+				"상품 productCode 가 중복되었습니다. 다시 확인하세요");
 		}
 		// 기본적으로 일반적인 예외 메시지
 		else if (message.contains("존재하지 않는 지점명입니다.")) {

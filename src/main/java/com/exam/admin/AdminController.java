@@ -1,7 +1,10 @@
 package com.exam.admin;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -32,6 +35,19 @@ public class AdminController {
 		this.adminService = adminService;
 	}
 
+	//상품코드 + 개별상품 전체 보기
+	@GetMapping("/findAllProductCode")
+	public ResponseEntity<List<ProductDTO>> findALlProductCode() {
+		List<ProductDTO> productDTOList = adminService.findAllProducts();
+		return ResponseEntity.status(200).body(productDTOList);
+	}
+
+	@GetMapping("/findAllGoods")
+	public ResponseEntity<List<GoodsDTO>> findAllGoods() {
+		List<GoodsDTO> goodsDTOList = adminService.findAllGoods();
+		return ResponseEntity.status(200).body(goodsDTOList);
+	}
+
 	@PostMapping("/addProductCode")
 	public ResponseEntity<ProductDTO> addProduct(@Valid @RequestBody ProductDTO productDTO) {
 		adminService.addProduct(productDTO);
@@ -41,7 +57,7 @@ public class AdminController {
 	@DeleteMapping("/deleteProductCode/{productCode}")
 	public ResponseEntity<ProductDTO> deleteProduct(@PathVariable String productCode) {
 		adminService.deleteProduct(productCode);
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.ok().build();  // 상태 코드 200 OK
 	}
 
 	@PutMapping("/updateProductCode/{productCode}")
@@ -49,6 +65,25 @@ public class AdminController {
 		@RequestBody ProductDTO productDTO) {
 		adminService.updateProduct(productCode, productDTO);
 		return ResponseEntity.status(201).body(productDTO); //201
+	}
+
+	@PostMapping("/addGoods")
+	public ResponseEntity<GoodsDTO> addGoods(@Valid @RequestBody GoodsDTO goodsDTO) {
+		adminService.addGoods(goodsDTO);
+		return ResponseEntity.created(null).body(goodsDTO);  // 201 상태코드 반환됨.
+	}
+
+	@DeleteMapping("/deleteGoods/{goodsId}")
+	public ResponseEntity<GoodsDTO> deleteGoods(@PathVariable Integer goodsId) {
+		adminService.deleteGoods(goodsId);
+		return ResponseEntity.ok().build();  // 상태 코드 200 OK
+	}
+
+	@PutMapping("/updateGoods/{goodsId}")
+	public ResponseEntity<GoodsDTO> updateGoods(@PathVariable Integer goodsId,
+		@RequestBody GoodsDTO goodsDTO) {
+		adminService.updateGoods(goodsId, goodsDTO);
+		return ResponseEntity.status(201).body(goodsDTO); //201
 	}
 
 }

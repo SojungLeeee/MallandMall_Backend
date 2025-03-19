@@ -35,4 +35,5 @@ public class Product {
 	@Column(nullable = false)
 	private int price;
 	private String image;
+
 }

@@ -1,10 +1,10 @@
 package com.exam.admin;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.exam.product.Product;
-
-public interface AdminRepositoryGoods extends JpaRepository<Product, String> {
+public interface AdminRepositoryGoods extends JpaRepository<Goods, Integer> {
 		/*
 			 JpaRepository에서 기본으로 제공하는 CRUD 메서드 사용 가능
 
@@ -18,11 +18,12 @@ public interface AdminRepositoryGoods extends JpaRepository<Product, String> {
 			- 엔티티 갯수 : count()
 	    */
 
-		/*
-			관리자가
-			상품 코드 등록(추가)/수정/삭제, - product 테이블 사용
-			개별 상품 등록(추가)/수정/삭제, - goods 테이블 사용
-			행사     등록(추가)/수정/삭제, - 새로 테이블 생성해야함... 행사 테이블 - event 테이블
-			지점     등록(추가)/수정/삭제 기능 구현해야 함 - branch 테이블 사용
-		*/
+	/*
+		관리자가
+		상품 코드 등록(추가)/수정/삭제, - product 테이블 사용
+		개별 상품 등록(추가)/수정/삭제, - goods 테이블 사용
+		행사     등록(추가)/수정/삭제, - 새로 테이블 생성해야함... 행사 테이블 - event 테이블
+		지점     등록(추가)/수정/삭제 기능 구현해야 함 - branch 테이블 사용
+	*/
+	Optional<Goods> findByGoodsId(int findByGoodsId);
 }

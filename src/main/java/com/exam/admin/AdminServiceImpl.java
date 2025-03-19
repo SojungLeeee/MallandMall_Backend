@@ -1,5 +1,8 @@
 package com.exam.admin;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 import com.exam.product.Product;
@@ -10,10 +13,89 @@ import jakarta.transaction.Transactional;
 @Service
 public class AdminServiceImpl implements AdminService {
 
+	AdminRepositoryGoods adminRepositoryGoods;
 	AdminRepositoryProducts adminRepositoryProducts;
 
-	public AdminServiceImpl(AdminRepositoryProducts adminRepositoryProducts) {
+	public AdminServiceImpl(AdminRepositoryGoods adminRepositoryGoods,
+		AdminRepositoryProducts adminRepositoryProducts) {
+		this.adminRepositoryGoods = adminRepositoryGoods;
 		this.adminRepositoryProducts = adminRepositoryProducts;
+	}
+
+	@Override
+	public void addGoods(GoodsDTO goodsDTO) {
+		Goods goods = Goods.builder()
+			.productCode(goodsDTO.getProductCode())
+			.branchName(goodsDTO.getBranchName())
+			.expirationDate(goodsDTO.getExpirationDate())
+			.build();
+		adminRepositoryGoods.save(goods);
+	}
+
+	@Override
+	@Transactional
+	public void deleteGoods(int goodsId) {
+		Goods goods = adminRepositoryGoods.findByGoodsId(goodsId).orElse(null);
+		System.out.println("goods : " + goods);
+
+		if (goods != null) {
+			adminRepositoryGoods.delete(goods);
+			// adminRepositoryProducts.deleteById(product.getId());
+		}
+	}
+
+	@Override
+	@Transactional
+	public void updateGoods(int goodsId, GoodsDTO goodsDTO) {
+
+		Goods goods = adminRepositoryGoods.findByGoodsId(goodsId).orElse(null);
+		//ProductCode 찾으면 product로 리턴, 없으면 null 리턴
+
+		if (goods != null) {
+			goods.setProductCode(goodsDTO.getProductCode());
+			goods.setBranchName(goodsDTO.getBranchName());
+			goods.setExpirationDate(goodsDTO.getExpirationDate());
+		}
+
+	}
+
+	@Override
+	public List<ProductDTO> findAllProducts() {
+		List<Product> productList = adminRepositoryProducts.findAll();
+
+		//Stream API 의 Map 이용
+		List<ProductDTO> productDTOList =
+			productList.stream().map(t -> { //t는 Todo
+				ProductDTO dto = ProductDTO.builder()
+					.productCode(t.getProductCode())
+					.category(t.getCategory())
+					.productName(t.getProductName())
+					.description(t.getDescription())
+					.price(t.getPrice())
+					.build();
+				return dto;
+			}).collect(Collectors.toList());
+
+		return productDTOList;
+	}
+
+	@Override
+	public List<GoodsDTO> findAllGoods() {
+		List<Goods> goodsList = adminRepositoryGoods.findAll();
+
+		//Stream API 의 Map 이용
+		List<GoodsDTO> goodsDTOList =
+			goodsList.stream().map(t -> { //t는 Todo
+				GoodsDTO dto = GoodsDTO.builder()
+					.goodsId(t.getGoodsId())
+					.productCode(t.getProductCode())
+					.branchName(t.getBranchName())
+					.expirationDate(t.getExpirationDate())
+					.build();
+				return dto;
+			}).collect(Collectors.toList());
+
+		return goodsDTOList;
 	}
 
 	@Override
@@ -36,11 +118,12 @@ public class AdminServiceImpl implements AdminService {
 	public void deleteProduct(String productCode) {
 
 		Product product = adminRepositoryProducts.findByProductCode(productCode).orElse(null);
+		System.out.println("product : " + product);
 		//productCode 찾으면 product 리턴, 없으면 null 리턴
 
 		if (product != null) {
 			adminRepositoryProducts.delete(product);
-			//			todoRepository.deleteById(id);
+			// adminRepositoryProducts.deleteById(product.getId());
 		}
 	}
 
@@ -67,4 +150,5 @@ public class AdminServiceImpl implements AdminService {
 		}
 
 	}
+
 }

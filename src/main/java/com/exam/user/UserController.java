@@ -42,6 +42,9 @@ public class UserController {
 
 	@PostMapping("/signup")
 	public ResponseEntity<UserDTO> signup(@Valid @RequestBody UserDTO dto) {
+
+		UserDTO userDTO = userService.findById(dto.getUserId());
+
 		log.info("비번 암호화전: {}", dto.getPassword());
 		//비번을 암호화 해야됨.
 

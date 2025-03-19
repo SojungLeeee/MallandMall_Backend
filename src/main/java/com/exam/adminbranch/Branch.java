@@ -1,9 +1,8 @@
-package com.exam.product;
+package com.exam.adminbranch;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,22 +17,12 @@ import lombok.ToString;
 @ToString
 @Builder
 @Entity
-@Table(name = "products")
-public class Product {
-
+public class Branch {
 	@Id
-	private String productCode;
+	@Column(nullable = false)
+	String branchName;
 
 	@Column(nullable = false)
-	private String category;
-
-	@Column(nullable = false)
-	private String productName;
-
-	private String description;
-
-	@Column(nullable = false)
-	private int price;
-	private String image;
+	String branchAddress;
 
 }

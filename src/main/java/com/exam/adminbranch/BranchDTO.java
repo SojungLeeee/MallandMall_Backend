@@ -1,4 +1,4 @@
-package com.exam.admin;
+package com.exam.adminbranch;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -16,13 +16,9 @@ import lombok.ToString;
 @ToString
 @Builder
 @Entity
-public class EventsDTO {
-
+public class BranchDTO {
 	@Id
-	Long eventId;
-	String branch;
-	String eventTitle;
-	String registrationDate;
-
-
+	String branchName;
+	String branchAddress;
 }
+

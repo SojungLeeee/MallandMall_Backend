@@ -60,11 +60,15 @@ public class ReviewController {
 	// 특정 사용자가 쓴 리뷰만 조회
 	@GetMapping("/user/{userId}")
 	public ResponseEntity<List<ReviewDTO>> getReviewsByUser(@PathVariable String userId) {
-		String userId2 = getAuthenticatedUserId();
 
+		String authenticatedUserId = getAuthenticatedUserId();
+		if (!authenticatedUserId.equals(userId)) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+		}
 		List<ReviewDTO> reviews = reviewService.getReviewsByUser(userId);
 		return ResponseEntity.ok(reviews);
 	}
+
 
 	private String getAuthenticatedUserId() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

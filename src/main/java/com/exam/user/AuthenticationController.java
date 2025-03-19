@@ -53,7 +53,7 @@ public class AuthenticationController {
 			return ResponseEntity.status(200).body(token);
 		} else {
 			JwtTokenResponse failedResponse = new JwtTokenResponse(null, map.get("userId"), "ROLE_NONE");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(failedResponse);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(failedResponse);
 		}
 	}
 

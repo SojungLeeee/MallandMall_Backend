@@ -43,7 +43,8 @@ public class CustomizedResponseEntityExceptionHandler
 
 	//이부분 다시 보아야함
 
-	@ExceptionHandler(value = {SQLIntegrityConstraintViolationException.class, ConstraintViolationException.class})
+	@ExceptionHandler(value = {SQLIntegrityConstraintViolationException.class, ConstraintViolationException.class,
+		RuntimeException.class})
 	public ResponseEntity<ErrorDetails> errorPage(Exception e) {
 		log.info("logger:중복 예외처리.: {}", e.getMessage());
 
@@ -62,7 +63,7 @@ public class CustomizedResponseEntityExceptionHandler
 			errorDetails = new ErrorDetails("상품 중복", LocalDate.now(), "상품 productCode 가 중복되었습니다. 다시 확인하세요");
 		}
 		// 기본적으로 일반적인 예외 메시지
-		else if (message.contains("CONSTRAINT `br1_inv_brName_fk` FOREIGN KEY (`branchName`)")) {
+		else if (message.contains("존재하지 않는 지점명입니다.")) {
 			errorDetails = new ErrorDetails("branch 테이블에 없는 branchName 입력", LocalDate.now(),
 				"존재하지 않는 지점명입니다. 지점을 추가하거나 다른 지점명을 입력하세요.");
 		} else {

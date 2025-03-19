@@ -1,10 +1,13 @@
 package com.exam.admin;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.exam.adminbranch.Branch;
+import com.exam.adminbranch.BranchRepository;
 import com.exam.inventory.Inventory;
 import com.exam.inventory.InventoryRepository;
 import com.exam.product.Product;
@@ -18,17 +21,29 @@ public class AdminServiceImpl implements AdminService {
 	AdminRepositoryGoods adminRepositoryGoods;
 	AdminRepositoryProducts adminRepositoryProducts;
 	InventoryRepository inventoryRepository;
+	BranchRepository branchRepository;
 
 	public AdminServiceImpl(AdminRepositoryGoods adminRepositoryGoods,
 		AdminRepositoryProducts adminRepositoryProducts,
-		InventoryRepository inventoryRepository) {
+		InventoryRepository inventoryRepository,
+		BranchRepository branchRepository) {
 		this.adminRepositoryGoods = adminRepositoryGoods;
 		this.adminRepositoryProducts = adminRepositoryProducts;
 		this.inventoryRepository = inventoryRepository;
+		this.branchRepository = branchRepository;
 	}
 
 	@Override
 	public void addGoods(GoodsDTO goodsDTO) {
+		// 1. 지점이 존재하는지 확인
+		Optional<Branch> branch = branchRepository.findByBranchName(goodsDTO.getBranchName());
+
+		// 지점이 존재하지 않으면, 외래키 제약 조건 오류 발생
+		if (!branch.isPresent()) {
+			throw new RuntimeException("존재하지 않는 지점명입니다. 지점명을 확인해주세요." + goodsDTO.getBranchName());
+		}
+
+		// 2. 지점이 존재하면 Goods 추가
 		Goods goods = Goods.builder()
 			.productCode(goodsDTO.getProductCode())
 			.branchName(goodsDTO.getBranchName())
@@ -36,12 +51,12 @@ public class AdminServiceImpl implements AdminService {
 			.build();
 		adminRepositoryGoods.save(goods);
 
-		// 2. inventory 테이블에서 해당 productCode와 branchName을 가진 레코드 확인
+		// 3. Inventory 테이블에서 해당 productCode와 branchName을 가진 레코드 확인
 		Inventory inventory = inventoryRepository.findByProductCodeAndBranchName(
 			goodsDTO.getProductCode(), goodsDTO.getBranchName());
 
 		if (inventory == null) {
-			// 2-1. Inventory에 해당 레코드가 없으면 새로 추가 (quantity는 1로 설정)
+			// 4. Inventory에 해당 레코드가 없으면 새로 추가 (quantity는 1로 설정)
 			Inventory newInventory = Inventory.builder()
 				.productCode(goodsDTO.getProductCode())
 				.branchName(goodsDTO.getBranchName())
@@ -49,11 +64,10 @@ public class AdminServiceImpl implements AdminService {
 				.build();
 			inventoryRepository.save(newInventory);
 		} else {
-			// 2-2. Inventory에 해당 레코드가 있으면 수량을 1 증가시킴
+			// 5. Inventory에 해당 레코드가 있으면 수량을 1 증가시킴
 			inventory.setQuantity(inventory.getQuantity() + 1); // quantity 1 증가
 			inventoryRepository.save(inventory);  // 갱신된 정보 저장
 		}
-
 	}
 
 	@Override

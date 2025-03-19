@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.exam.inventory.Inventory;
+import com.exam.inventory.InventoryRepository;
 import com.exam.product.Product;
 import com.exam.product.ProductDTO;
 
@@ -15,11 +17,14 @@ public class AdminServiceImpl implements AdminService {
 
 	AdminRepositoryGoods adminRepositoryGoods;
 	AdminRepositoryProducts adminRepositoryProducts;
+	InventoryRepository inventoryRepository;
 
 	public AdminServiceImpl(AdminRepositoryGoods adminRepositoryGoods,
-		AdminRepositoryProducts adminRepositoryProducts) {
+		AdminRepositoryProducts adminRepositoryProducts,
+		InventoryRepository inventoryRepository) {
 		this.adminRepositoryGoods = adminRepositoryGoods;
 		this.adminRepositoryProducts = adminRepositoryProducts;
+		this.inventoryRepository = inventoryRepository;
 	}
 
 	@Override
@@ -30,17 +35,48 @@ public class AdminServiceImpl implements AdminService {
 			.expirationDate(goodsDTO.getExpirationDate())
 			.build();
 		adminRepositoryGoods.save(goods);
+
+		// 2. inventory 테이블에서 해당 productCode와 branchName을 가진 레코드 확인
+		Inventory inventory = inventoryRepository.findByProductCodeAndBranchName(
+			goodsDTO.getProductCode(), goodsDTO.getBranchName());
+
+		if (inventory == null) {
+			// 2-1. Inventory에 해당 레코드가 없으면 새로 추가 (quantity는 1로 설정)
+			Inventory newInventory = Inventory.builder()
+				.productCode(goodsDTO.getProductCode())
+				.branchName(goodsDTO.getBranchName())
+				.quantity(1) // 처음 들어온 상품이므로 quantity는 1
+				.build();
+			inventoryRepository.save(newInventory);
+		} else {
+			// 2-2. Inventory에 해당 레코드가 있으면 수량을 1 증가시킴
+			inventory.setQuantity(inventory.getQuantity() + 1); // quantity 1 증가
+			inventoryRepository.save(inventory);  // 갱신된 정보 저장
+		}
+
 	}
 
 	@Override
 	@Transactional
 	public void deleteGoods(int goodsId) {
 		Goods goods = adminRepositoryGoods.findByGoodsId(goodsId).orElse(null);
-		System.out.println("goods : " + goods);
 
 		if (goods != null) {
 			adminRepositoryGoods.delete(goods);
 			// adminRepositoryProducts.deleteById(product.getId());
+		}
+
+		// 2. Inventory 테이블에서 해당 productCode와 branchName을 가진 레코드 확인
+		Inventory inventory = inventoryRepository.findByProductCodeAndBranchName(
+			goods.getProductCode(), goods.getBranchName());
+
+		// 2-1. Inventory의 quantity가 1 이상이면 1 감소
+		if (inventory.getQuantity() > 1) {
+			inventory.setQuantity(inventory.getQuantity() - 1); // quantity 1 감소
+			inventoryRepository.save(inventory);  // 갱신된 정보 저장
+		} else {
+			// 2-2. Inventory의 quantity가 1이면 해당 레코드 삭제
+			inventoryRepository.delete(inventory);  // 해당 레코드 삭제
 		}
 	}
 

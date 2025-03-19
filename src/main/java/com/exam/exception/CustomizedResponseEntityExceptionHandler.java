@@ -49,6 +49,7 @@ public class CustomizedResponseEntityExceptionHandler
 
 		// 예외 메시지에서 "user" 또는 "products" 키워드를 포함하는지 체크
 		String message = e.getMessage();
+		System.out.println(message);
 
 		ErrorDetails errorDetails;
 
@@ -61,7 +62,10 @@ public class CustomizedResponseEntityExceptionHandler
 			errorDetails = new ErrorDetails("상품 중복", LocalDate.now(), "상품 productCode 가 중복되었습니다. 다시 확인하세요");
 		}
 		// 기본적으로 일반적인 예외 메시지
-		else {
+		else if (message.contains("CONSTRAINT `br1_inv_brName_fk` FOREIGN KEY (`branchName`)")) {
+			errorDetails = new ErrorDetails("branch 테이블에 없는 branchName 입력", LocalDate.now(),
+				"존재하지 않는 지점명입니다. 지점을 추가하거나 다른 지점명을 입력하세요.");
+		} else {
 			errorDetails = new ErrorDetails("알 수 없는 오류", LocalDate.now(), "예상치 못한 오류가 발생했습니다");
 		}
 

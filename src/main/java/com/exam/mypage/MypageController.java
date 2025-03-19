@@ -52,6 +52,7 @@ public class MypageController {
 	}
 
 	//  회원 탈퇴
+
 	@DeleteMapping("/delete")
 	public ResponseEntity<?> deleteMypage() {
 

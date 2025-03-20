@@ -3,8 +3,15 @@ package com.exam.adminbranch;
 import java.util.List;
 
 public interface BranchService {
+	//모든 지점 조회
+	List<Branch> getAllBranches();
 
-	List<Branch> getAllBranches(); //모든 지점 조회
+	//지점 추가
+	Branch createBranches(Branch branch);
 
-	Branch getBranchByName(String branchName); // 특정 지점 조회 (지점 이름으로 조회)
+	//지점 수정
+	Branch updateBranches(Branch branch);
+
+	//지점 삭제
+	void deleteBranches(Branch branch, String branchName);
 }

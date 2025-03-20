@@ -1,18 +1,11 @@
 package com.exam.adminbranch;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin/event")
@@ -36,6 +29,14 @@ public class EventController {
 	@PostMapping
 	public ResponseEntity<String> createEvent(@RequestBody EventDTO eventDTO) {
 		try {
+			Event event = Event.builder()
+				.eventId(eventDTO.getEventId())
+				.branch(eventDTO.getBranch())
+				.eventTitle(eventDTO.getEventTitle())
+				.category(eventDTO.getCategory())
+				.registrationDate(eventDTO.getRegistrationDate())
+				.build();
+
 			eventService.createEvent(eventDTO);
 			return ResponseEntity.status(HttpStatus.CREATED).body("이벤트가 성공적으로 생성되었습니다.");
 		} catch (Exception e) {
@@ -47,6 +48,12 @@ public class EventController {
 	@PutMapping("/{eventId}")
 	public ResponseEntity<String> updateEvent(@PathVariable String eventId, @RequestBody EventDTO eventDTO) {
 		try {
+			Event event = Event.builder()
+				.eventTitle(eventDTO.getEventTitle())
+				.branch(eventDTO.getBranch())
+				.registrationDate(eventDTO.getRegistrationDate())
+				.build();
+
 			eventService.updateEvent(eventId, eventDTO);
 			return ResponseEntity.ok("이벤트가 성공적으로 수정되었습니다.");
 		} catch (IllegalArgumentException e) {

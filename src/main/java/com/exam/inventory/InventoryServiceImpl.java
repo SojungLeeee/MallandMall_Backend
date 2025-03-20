@@ -1,5 +1,8 @@
 package com.exam.inventory;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,6 +26,23 @@ public class InventoryServiceImpl implements InventoryService {
 			.build();
 
 		return inventoryDTO;
+	}
+
+	@Override
+	public List<InventoryDTO> findAllInventory() {
+		List<Inventory> inventoryList = inventoryRepository.findAll();
+		//Stream API 의 Map 이용
+		List<InventoryDTO> inventoryDTOList =
+			inventoryList.stream().map(i -> {
+				InventoryDTO dto = InventoryDTO.builder()
+					.productCode(i.getProductCode())
+					.quantity(i.getQuantity())
+					.branchName(i.getBranchName())
+					.build();
+				return dto;
+			}).collect(Collectors.toList());
+
+		return inventoryDTOList;
 	}
 
 }

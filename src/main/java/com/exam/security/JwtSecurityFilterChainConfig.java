@@ -70,8 +70,7 @@ public class JwtSecurityFilterChainConfig {
 			// 모든 경로에 대해 인증 없이 접근 허용
 
 			.requestMatchers("/home", "/signup", "/authenticate", "/reset-password", "/findid"
-				, "/*","/cart/**","/find*").permitAll()
-
+				, "/*", "/cart/**", "/find*", "/**").permitAll()
 
 			//.requestMatchers("/**").permitAll()
 			// OPTIONS 메서드에 대한 요청도 인증 없이 허용

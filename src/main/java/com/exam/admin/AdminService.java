@@ -6,7 +6,6 @@ import com.exam.product.ProductDTO;
 
 public interface AdminService {
 
-
 	List<ProductDTO> findAllProducts();
 
 	List<GoodsDTO> findAllGoods();
@@ -22,5 +21,7 @@ public interface AdminService {
 	void deleteGoods(int goodsId);
 
 	void updateGoods(int goodsId, GoodsDTO goodsDTO);
+
+	ProductDTO findByProductCode(String productCode);
 
 }

@@ -114,6 +114,15 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	@Override
+	public ProductDTO findByProductCode(String productCode) {
+		Product product = productRepository.findById(productCode).orElse(null);
+		if (product == null) {
+			return null;
+		}
+		return convertToDTO(product);
+	}
+
+	@Override
 	public List<ProductDTO> findAllProducts() {
 		List<Product> productList = adminRepositoryProducts.findAll();
 
@@ -214,4 +223,19 @@ public class AdminServiceImpl implements AdminService {
 
 	}
 
+	// entity에서 dto로 만들기
+	private ProductDTO convertToDTO(Product product) {
+		return ProductDTO.builder()
+			.productCode(product.getProductCode())
+			.category(product.getCategory())
+			.productName(product.getProductName())
+			.description(product.getDescription())
+			.price(product.getPrice())
+			.image(product.getImage())
+			.build();
+	}
+
 }
+
+
+

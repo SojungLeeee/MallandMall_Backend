@@ -1,6 +1,5 @@
 package com.exam.admin;
 
-
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,6 +35,13 @@ public class AdminController {
 
 	public AdminController(AdminService adminService) {
 		this.adminService = adminService;
+	}
+
+	//  특정 상품 조회
+	@GetMapping("/findByProductCode/{productCode}")
+	public ResponseEntity<ProductDTO> findByProductCode(@PathVariable String productCode) {
+		ProductDTO product = adminService.findByProductCode(productCode);
+		return (product != null) ? ResponseEntity.ok(product) : ResponseEntity.notFound().build();
 	}
 
 	//상품코드 + 개별상품 전체 보기

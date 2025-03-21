@@ -15,4 +15,6 @@ public interface UserService {
 
 	//비밀번호재설정
 	public boolean resetPassword(String userId, String phoneNumber, String newPassword);
+
+
 }

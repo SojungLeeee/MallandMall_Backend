@@ -75,7 +75,7 @@ public class JwtSecurityFilterChainConfig {
 
 			//.requestMatchers("/**").permitAll()
 			// OPTIONS 메서드에 대한 요청도 인증 없이 허용
-			.requestMatchers("/product/**", "/review/**", "/order/**", "/admin/**").permitAll()
+			.requestMatchers("/product/**", "/review/**", "/order/**", "/admin/**","/auth/kakao").permitAll()
 			.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 			.anyRequest().authenticated()  // 그 외의 요청은 인증 필요
 		);

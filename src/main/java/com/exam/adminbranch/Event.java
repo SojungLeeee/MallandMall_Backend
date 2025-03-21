@@ -25,7 +25,7 @@ public class Event {
 	Long eventId;
 
 	@Column(nullable = false, length = 255)
-	String branch;
+	String branchName;
 
 	@Column(nullable = false, length = 255)
 	String eventTitle;
@@ -33,6 +33,4 @@ public class Event {
 	@Column(nullable = false, length = 20)
 	String category;
 
-	@Column(nullable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
-	String registrationDate;
 }

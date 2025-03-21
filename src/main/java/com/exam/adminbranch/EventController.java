@@ -19,9 +19,9 @@ public class EventController {
 	}
 
 	// 지점별 이벤트 조회
-	@GetMapping("/branch/{branch}")
-	public ResponseEntity<List<Event>> getEventsByBranch(@PathVariable String branch) {
-		List<Event> events = eventService.getEventsByBranch(branch);
+	@GetMapping("/branch/{branchName}")
+	public ResponseEntity<List<Event>> getEventsByBranch(@PathVariable String branchName) {
+		List<Event> events = eventService.getAllEventsByBranch(branchName);
 		return ResponseEntity.ok(events);
 	}
 
@@ -31,10 +31,9 @@ public class EventController {
 		try {
 			Event event = Event.builder()
 				.eventId(eventDTO.getEventId())
-				.branch(eventDTO.getBranch())
+				.branchName(eventDTO.getBranchName())
 				.eventTitle(eventDTO.getEventTitle())
 				.category(eventDTO.getCategory())
-				.registrationDate(eventDTO.getRegistrationDate())
 				.build();
 
 			eventService.createEvent(eventDTO);
@@ -50,8 +49,7 @@ public class EventController {
 		try {
 			Event event = Event.builder()
 				.eventTitle(eventDTO.getEventTitle())
-				.branch(eventDTO.getBranch())
-				.registrationDate(eventDTO.getRegistrationDate())
+				.branchName(eventDTO.getBranchName())
 				.build();
 
 			eventService.updateEvent(eventId, eventDTO);

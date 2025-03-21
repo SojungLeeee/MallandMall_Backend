@@ -20,10 +20,10 @@ public class EventDTO {
 
 	@Id
 	Long eventId;
-	String branch;
+	String branchName;
 	String eventTitle;
 	String category;
-	String registrationDate;
+
 
 
 }

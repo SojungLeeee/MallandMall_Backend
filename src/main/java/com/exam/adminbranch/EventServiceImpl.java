@@ -17,17 +17,19 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public List<Event> getEventsByBranch(String branch) {
-		return eventRepository.findByBranch(branch);
+	public List<Event> getAllEventsByBranch(String branch) {
+		if (branch.equals("default")) {
+			return eventRepository.findAll();
+		}
+		return eventRepository.findByBranchName(branch);
 	}
 
 	@Override
 	public void createEvent(EventDTO dto) {
 		Event event = Event.builder()
 			.category(dto.getCategory())
-			.branch(dto.getBranch())
+			.branchName(dto.getBranchName())
 			.eventTitle(dto.getEventTitle())
-			.registrationDate(dto.getRegistrationDate())
 			.build();
 
 		eventRepository.save(event);
@@ -40,9 +42,9 @@ public class EventServiceImpl implements EventService {
 			.orElseThrow(() -> new IllegalArgumentException("해당 ID의 이벤트가 존재하지 않습니다."));
 
 		existingEvent.setCategory(dto.getCategory());
-		existingEvent.setBranch(dto.getBranch());
+		existingEvent.setBranchName(dto.getBranchName());
 		existingEvent.setEventTitle(dto.getEventTitle());
-		existingEvent.setRegistrationDate(dto.getRegistrationDate());
+
 
 		eventRepository.save(existingEvent);
 	}

@@ -64,4 +64,20 @@ public class CartServiceImpl implements CartService {
 			throw new RuntimeException("장바구니에 해당 상품이 없습니다.");
 		}
 	}
+
+	public Cart updateCartItemQuantity(String userId, String productCode, int quantity) {
+		Cart cartItem = cartRepository.findByUserIdAndProductCode(userId, productCode);
+
+		if (cartItem == null) {
+			throw new RuntimeException("장바구니에 해당 상품이 없습니다.");
+		}
+
+		if (quantity <= 0) {
+			cartRepository.deleteByUserIdAndProductCode(userId, productCode); // ✅ 바로 삭제!
+			return null;
+		}
+
+		cartItem.setQuantity(quantity);
+		return cartRepository.save(cartItem);
+	}
 }

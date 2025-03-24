@@ -17,6 +17,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -52,7 +54,7 @@ public class JwtSecurityFilterChainConfig {
 
 		// /home, /signup , /authenticate 3가지 인증없이 요청이 가능
 		// 나머지 요청은 모두 인증 필요. 만약에 인증없이 요청하면 401 에러가 발생됨.
-		//    	  httpSecurity.authorizeHttpRequests((authorize) -> authorize
+		//         httpSecurity.authorizeHttpRequests((authorize) -> authorize
 		//                  .requestMatchers(mvcMatcherBuilder.pattern("/home")).permitAll()
 		//                 // .requestMatchers("/board").permitAll()
 		//                  //.requestMatchers("/hello-world","/signup").permitAll()
@@ -62,9 +64,9 @@ public class JwtSecurityFilterChainConfig {
 		//                  // 시험적으로 요청하는 작업이 있음. 예> ping 작업.  이것을 preflight 작업이라고 한다.
 		//                  // 이때 OPTIONS 메서드로 요청함. 따라서 이것을 허용하는 작업임.
 		//                  .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.OPTIONS,"/**")).permitAll()
-		//          		  .anyRequest()
-		//          		  .authenticated()
-		//          		);
+		//                  .anyRequest()
+		//                  .authenticated()
+		//                );
 
 		httpSecurity.authorizeHttpRequests((authorize) -> authorize
 			// 모든 경로에 대해 인증 없이 접근 허용
@@ -74,7 +76,10 @@ public class JwtSecurityFilterChainConfig {
 
 			//.requestMatchers("/**").permitAll()
 			// OPTIONS 메서드에 대한 요청도 인증 없이 허용
-			.requestMatchers("/product/**", "/review/**", "/order/**", "/admin/**").permitAll()
+
+			//Google 로그인 API 경로 추가
+			.requestMatchers("/auth/google").permitAll()
+			.requestMatchers("/product/**", "/review/**", "/order/**", "/admin/**","/auth/kakao").permitAll()
 			.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 			.anyRequest().authenticated()  // 그 외의 요청은 인증 필요
 		);
@@ -139,5 +144,11 @@ public class JwtSecurityFilterChainConfig {
 			throw new IllegalStateException(
 				"Unable to generate an RSA Key Pair", e);
 		}
+	}
+
+	// 구글 로그인
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
 	}
 }

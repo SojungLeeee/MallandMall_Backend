@@ -1,5 +1,7 @@
 package com.exam.user;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, String> {
@@ -23,4 +25,6 @@ public interface UserRepository extends JpaRepository<User, String> {
 	User findByuserIdAndPhoneNumber(String userId, String phoneNumber);
 
 	User findByUserNameAndEmail(String userName, String email);
+
+	Optional<User> findByKakaoId(Long kakaoId);
 }

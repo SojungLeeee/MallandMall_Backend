@@ -62,4 +62,25 @@ public class JwtTokenProvider {
 			return null; // 또는 예외 발생
 		}
 	}
+	// 기존 JWT 방식은 평문화된 비밀번호를 사용, 소셜로그인에서는 암호화된 비밀번호를 반환하기 소셜 로그인용 메서드 제작
+	public JwtTokenResponse authenticateWithSocial(String userId) {
+		UserDTO dto = userService.findById(userId);
+
+		// 사용자가 존재하지 않는 경우
+		if (dto == null) {
+			return null;
+		}
+
+		String encodedtoken = null;
+
+		// 비밀번호 검증 없이 토큰 생성
+		List<GrantedAuthority> authorities = new ArrayList<>();
+		authorities.add(new SimpleGrantedAuthority(dto.getRole().toString()));
+
+		UsernamePasswordAuthenticationToken token =
+			new UsernamePasswordAuthenticationToken(userId, null, authorities);
+		encodedtoken = tokenService.generateToken(token);
+
+		return new JwtTokenResponse(encodedtoken, userId, dto.getRole().toString());
+	}
 }

@@ -79,17 +79,11 @@ public class ProductServiceImpl implements ProductService {
 		// userId에 맞는 Product 엔티티 목록 가져오기
 		List<Product> products = productRepository.findProductsByUserId(userId);
 
-		// Product 엔티티를 ProductDTO로 변환 (builder 패턴 사용)
-		List<ProductDTO> productDTOs = products.stream()
-			.map(product -> ProductDTO.builder()  // 빌더 패턴을 사용하여 객체 생성
-				.productCode(product.getProductCode())
-				.productName(product.getProductName())
-				.category(product.getCategory())
-				.price(product.getPrice())  // price가 double이므로 적절히 변환
-				.build())  // build() 메소드로 객체 생성
-			.collect(Collectors.toList());
-
-		return productDTOs;
+		// 각 Product에 대해 평균 별점 계산 후 ProductDTO로 변환
+		return products.stream().map(product -> {
+			double avgRating = reviewRepository.getAverageRating(product.getProductCode()); // 평균 별점 가져오기
+			return convertToDTO(product, avgRating); // convertToDTO 메소드로 변환
+		}).collect(Collectors.toList());
 	}
 
 }

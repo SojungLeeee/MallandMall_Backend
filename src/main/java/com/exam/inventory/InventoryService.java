@@ -7,4 +7,6 @@ public interface InventoryService {
 	InventoryDTO findByProductCodeAndBranchName(String productCode, String branchName);
 
 	List<InventoryDTO> findAllInventory();
+
+	List<InventoryDTO> findByProductCode(String productCode);
 }

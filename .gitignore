@@ -36,3 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
+# Ignore application-secret.properties to protect sensitive data
+/application-secret.properties
+

@@ -55,4 +55,6 @@ public class User {
 	@Column(unique = true)
 	private Long kakaoId; // 카카오 로그인 전용 ID
 
+	@Column(unique = true)
+	private String googleId;
 }

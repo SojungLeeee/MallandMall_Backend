@@ -96,11 +96,11 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
 			KakaoUserDTO kakaoUser = getKakaoUserInfo(accessToken);
 
 			User user = userRepository.findByKakaoId(kakaoUser.getId()).orElse(null);
-
+			// 회원가입 처리
 			if (user == null) {
 				user = new User();
 				user.setUserId("kakao_" + kakaoUser.getId());
-				user.setPassword(UUID.randomUUID().toString());
+				user.setPassword(UUID.randomUUID().toString()); // 랜덤 비밀번호
 				user.setUserName(kakaoUser.getNickname());
 				user.setEmail(kakaoUser.getEmail());
 				user.setKakaoId(kakaoUser.getId());

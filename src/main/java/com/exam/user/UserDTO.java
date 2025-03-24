@@ -53,6 +53,15 @@ public class UserDTO {
 	@Column(updatable = false) //저장할때만 자동저장O 수정할때는 저장 X 을위한것
 	LocalDate createDate; //저장할때만 자동저장O 수정할때는 저장 X
 
+
+	@Column(unique = true)
+	private Long kakaoId; // 카카오 로그인 전용 ID
+
+	@Column(unique = true)
+	private String googleId; // Google 로그인 전용 ID
+
+
+
 	public void updatePassword(String newPassword) {
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		this.password = encoder.encode(newPassword);  // 비밀번호 암호화 후 업데이트

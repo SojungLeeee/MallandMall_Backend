@@ -19,7 +19,7 @@ public class KakaoAuthController {
 	public ResponseEntity<?> kakaoLogin(@RequestBody Map<String, String> requestBody) {
 		try {
 			String code = requestBody.get("code");
-			System.out.println(" 받은 인가 코드: " + code);
+
 
 			if (code == null || code.isEmpty()) {
 				throw new IllegalArgumentException(" 인가 코드가 비어 있습니다.");

@@ -57,4 +57,16 @@ public class CartController {
 
 
 	//수량증가
+	// 장바구니 상품 수량 변경
+	@PatchMapping("/{productCode}")
+	public ResponseEntity<Cart> updateCartItemQuantity(
+		@PathVariable String productCode,
+		@RequestParam int quantity) {
+
+		String userId = getAuthenticatedUserId();  // 현재 로그인한 사용자 ID 가져오기
+		Cart updatedCartItem = cartService.updateCartItemQuantity(userId, productCode, quantity);
+
+		return ResponseEntity.ok(updatedCartItem);
+	}
+
 }

@@ -11,4 +11,6 @@ public interface ProductService {
 
 	List<ProductDTO> getProductsByName(String productName); // 상품 이름으로 검색
 
+	List<ProductDTO> getProductsByUserId(String userId);
+
 }

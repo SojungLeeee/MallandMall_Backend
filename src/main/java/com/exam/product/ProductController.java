@@ -3,6 +3,8 @@ package com.exam.product;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +45,21 @@ public class ProductController {
 	public ResponseEntity<List<ProductDTO>> searchProductsByName(@PathVariable String productName) {
 		List<ProductDTO> products = productService.getProductsByName(productName);
 		return (products.isEmpty()) ? ResponseEntity.noContent().build() : ResponseEntity.ok(products);
+	}
+
+	@GetMapping("/likecategories")
+	public ResponseEntity<?> getAllProductsByCategory() {
+		Authentication authentication =
+			SecurityContextHolder.getContext().getAuthentication();
+
+		String userId = authentication.getName();
+		if (userId == null) {
+			return ResponseEntity.status(401).body("인증되지 않은 사용자");
+		}
+		System.out.println(userId);
+
+		List<ProductDTO> productDTOs = productService.getProductsByUserId(userId);
+		return ResponseEntity.ok(productDTOs);
 	}
 
 }

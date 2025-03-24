@@ -1,5 +1,7 @@
 package com.exam.inventory;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
@@ -26,4 +28,6 @@ public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
 
 	// productCode와 branchName으로 Inventory를 조회
 	Inventory findByProductCodeAndBranchName(String productCode, String branchName);
+
+	List<Inventory> findByProductCode(String productCode);
 }

@@ -20,9 +20,9 @@ public class InventoryServiceImpl implements InventoryService {
 
 		//Inventory -> InventoryDTO
 		InventoryDTO inventoryDTO = InventoryDTO.builder()
-			.productCode(productCode)
+			.productCode(inventory.getProductCode())
 			.quantity(inventory.getQuantity())
-			.branchName(branchName)
+			.branchName(inventory.getBranchName())
 			.build();
 
 		return inventoryDTO;
@@ -32,6 +32,22 @@ public class InventoryServiceImpl implements InventoryService {
 	public List<InventoryDTO> findAllInventory() {
 		List<Inventory> inventoryList = inventoryRepository.findAll();
 		//Stream API 의 Map 이용
+		List<InventoryDTO> inventoryDTOList =
+			inventoryList.stream().map(i -> {
+				InventoryDTO dto = InventoryDTO.builder()
+					.productCode(i.getProductCode())
+					.quantity(i.getQuantity())
+					.branchName(i.getBranchName())
+					.build();
+				return dto;
+			}).collect(Collectors.toList());
+
+		return inventoryDTOList;
+	}
+
+	@Override
+	public List<InventoryDTO> findByProductCode(String productCode) {
+		List<Inventory> inventoryList = inventoryRepository.findByProductCode(productCode);
 		List<InventoryDTO> inventoryDTOList =
 			inventoryList.stream().map(i -> {
 				InventoryDTO dto = InventoryDTO.builder()

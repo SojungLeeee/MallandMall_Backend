@@ -1,5 +1,8 @@
 package com.exam.category;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LikecategoriesRepository extends JpaRepository<Likecategories, Integer> {
@@ -24,4 +27,9 @@ public interface LikecategoriesRepository extends JpaRepository<Likecategories, 
 		지점     등록(추가)/수정/삭제 기능 구현해야 함 - branch 테이블 사용
 	*/
 
+	// 사용자 ID로 선호 카테고리 목록을 가져오기
+	List<Likecategories> findByUserId(String userId);
+
+	//사용자 ID + 카테고리명으로 찾기
+	Optional<Likecategories> findByUserIdAndCategory(String userId, String category);
 }

@@ -108,4 +108,24 @@ public class UserServiceImpl implements UserService {
 		return false; // 일치하는 정보가 없으면 false 반환
 	}
 
+	@Override
+	public UserDTO getUserProfile(String userId) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+		return UserDTO.builder()
+			.userId(user.getUserId())
+			.userName(user.getUserName())
+			.post(user.getPost())
+			.addr1(user.getAddr1())
+			.addr2(user.getAddr2())
+			.phoneNumber(user.getPhoneNumber())
+			.email(user.getEmail())
+			.role(user.getRole())
+			.createDate(user.getCreateDate())
+			.build();
+	}
 }
+
+
+

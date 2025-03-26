@@ -1,6 +1,8 @@
 package com.exam.user;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -80,6 +82,18 @@ public class UserController {
 		} else {
 			return ResponseEntity.status(404).body("아이디와 전화번호가 일치하는 회원이 없습니다.");
 		}
+	}
+
+	@GetMapping("/profile")
+	public ResponseEntity<UserDTO> getUserProfile() {
+		String userId = getAuthenticatedUserId();
+		UserDTO user = userService.getUserProfile(userId);
+		return ResponseEntity.ok(user);
+	}
+
+	private String getAuthenticatedUserId() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		return authentication.getName();
 	}
 
 }

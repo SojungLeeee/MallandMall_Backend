@@ -25,4 +25,8 @@ public class OrderInfo {
 	private String addr1;  // 주소1
 	private String addr2;  // 주소2
 	private String phoneNumber;  // 연락처
+
+	@Column
+	private String impUid;
+
 }

@@ -1,5 +1,7 @@
 package com.exam.adminbranch;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,13 +26,18 @@ public class Event {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long eventId;
 
-	@Column(nullable = false, length = 255)
-	String branchName;
+	@Column(nullable = false, length = 20)
+	String category;
 
 	@Column(nullable = false, length = 255)
 	String eventTitle;
 
-	@Column(nullable = false, length = 20)
-	String category;
+	@Column(nullable = false)
+	LocalDateTime startDate;
 
+	@Column(nullable = false)
+	LocalDateTime endDate;
+
+	@Column(nullable = false)
+	String image;
 }

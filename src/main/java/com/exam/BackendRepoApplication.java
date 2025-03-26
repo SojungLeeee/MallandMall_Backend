@@ -5,10 +5,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing; // 👈 추가!
 
 import lombok.extern.slf4j.Slf4j;
 
 @SpringBootApplication
+@EnableJpaAuditing  // 👈 여기 추가!
 @Slf4j
 public class BackendRepoApplication {
 
@@ -17,15 +19,6 @@ public class BackendRepoApplication {
 		System.out.println("시작");
 	}
 
-	/*
-	   Cosrs 설정하지 않으면 다음과 같은 에러가 발생됨.
-	   Access to XMLHttpRequest at 'http://localhost:8090/app/요청맵핑'
-	   from origin 'http://localhost:3000' has been blocked by CORS policy:
-	   Response to preflight request doesn't pass access control
-	   check: No 'Access-Control-Allow-Origin' header is present
-	   on the requested resource.
-
-	*/
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
 		log.info("WebMvcConfigurer.addCorsMappings");

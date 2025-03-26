@@ -1,5 +1,7 @@
 package com.exam.adminbranch;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
@@ -20,10 +22,10 @@ public class EventDTO {
 
 	@Id
 	Long eventId;
-	String branchName;
-	String eventTitle;
 	String category;
-
-
+	String eventTitle;
+	LocalDateTime startDate;
+	LocalDateTime endDate;
+	String image;
 
 }

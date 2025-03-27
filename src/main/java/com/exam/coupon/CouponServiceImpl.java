@@ -1,6 +1,8 @@
 package com.exam.coupon;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -51,6 +53,34 @@ public class CouponServiceImpl implements CouponService {
 
 		Coupon coupon = createCoupon(userId, couponName, minPrice, benefits, couponType);
 		couponRepository.save(coupon);
+	}
+
+	//userId로 쿠폰 list 받아오기
+	@Override
+	public List<CouponDTO> findByUserId(String userId) {
+		List<Coupon> couponList = couponRepository.findByUserId(userId);
+		//Stream API 의 Map 이용
+		List<CouponDTO> couponDTOList =
+			couponList.stream().map(c -> { //c는 Coupon
+				CouponDTO dto = CouponDTO.builder()
+					.couponId(c.getCouponId())
+					.userId(c.getUserId())
+					.couponName(c.getCouponName())
+					.minPrice(c.getMinPrice())
+					.expirationDate(c.getExpirationDate())
+					.benefits(c.getBenefits())
+					.couponType(c.getCouponType())
+					.build();
+				return dto;
+			}).collect(Collectors.toList());
+
+		return couponDTOList;
+	}
+
+	// 유효기간이 지난 쿠폰 삭제
+	public void deleteExpiredCoupons(LocalDate now) {
+		// 유효기간이 지난 쿠폰을 삭제하는 로직
+		couponRepository.deleteByExpirationDateBefore(now);
 	}
 
 }

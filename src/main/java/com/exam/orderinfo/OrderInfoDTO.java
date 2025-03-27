@@ -25,7 +25,8 @@ public class OrderInfoDTO {
 	private String addr2;
 	private String phoneNumber;
 
-
 	private String impUid;
+
+	private int orderPrice;
 
 }

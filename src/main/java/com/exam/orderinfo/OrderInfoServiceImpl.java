@@ -1,5 +1,11 @@
 package com.exam.orderinfo;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import com.exam.order.OrderInfo;
 import com.exam.product.Product;
 import com.exam.product.ProductRepository;
@@ -7,14 +13,9 @@ import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +46,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 			}
 
 			int expectedAmount = product.getPrice() * dto.getQuantity();
+			int orderPrice = product.getPrice() * dto.getQuantity();
 			if (paidAmount != expectedAmount) {
 				log.warn(" 금액 불일치: 기대값 = {}, 실제 결제 = {}", expectedAmount, paidAmount);
 				return false;
@@ -60,6 +62,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 				.addr1(dto.getAddr1())
 				.addr2(dto.getAddr2())
 				.phoneNumber(dto.getPhoneNumber())
+				.orderPrice(orderPrice)
 				.impUid(dto.getImpUid())
 				.build();
 
@@ -83,7 +86,8 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 	@Override
 	public OrderInfoDTO getOrderInfoByImpUid(String impUid) {
 		OrderInfo order = orderInfoRepository.findByImpUid(impUid);
-		if (order == null) return null;
+		if (order == null)
+			return null;
 
 		return convertToDTO(order); // 이미 너가 가지고 있던 변환 메서드 사용
 	}
@@ -98,6 +102,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 			.post(order.getPost())
 			.addr1(order.getAddr1())
 			.addr2(order.getAddr2())
+			.orderPrice(order.getOrderPrice())
 			.phoneNumber(order.getPhoneNumber())
 			.impUid(order.getImpUid())
 			.build();

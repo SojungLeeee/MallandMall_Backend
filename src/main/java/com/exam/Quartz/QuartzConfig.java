@@ -34,7 +34,7 @@ public class QuartzConfig {
 		return TriggerBuilder.newTrigger()
 			.forJob(expirationDateCheckJobDetail())  // JobDetail과 연결
 			.withIdentity("ExpirationDateCheckJobTrigger", "DEFAULT")  // Trigger 이름과 그룹을 지정
-			.withSchedule(CronScheduleBuilder.cronSchedule("*/10 * * * * ?")) // 10초마다 실행
+			.withSchedule(CronScheduleBuilder.cronSchedule("0 0 * * * ?")) // 1시간마다 실행 (매시 정각)
 			.build();
 	}
 

@@ -4,13 +4,14 @@ package com.exam.orderinfo;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+
 import com.exam.order.OrderInfo;
 
 public interface OrderInfoRepository extends JpaRepository<com.exam.order.OrderInfo, Long> {
 	// 댓글쓸떄 구매내역 조회
 	boolean existsByUserIdAndProductCode(String userId, String productCode);
 
-	OrderInfo findByImpUid(String impUid);
+	List<OrderInfo> findByImpUid(String impUid);
 
 	List<OrderInfo> findByUserId(String userId);
 }

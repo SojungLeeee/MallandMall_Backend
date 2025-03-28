@@ -10,9 +10,11 @@ import com.siot.IamportRestClient.IamportClient;
 public class IamportConfig {
 
 	@Value("0020266371022425")
+	//@Value("${portone.imp_key}")
 	private String apiKey;
 
 	@Value("xfeF1iM90zvEisoRGcRyVPP7M3ef69lbLxzXgngxUDHwGtOoqYNMMHbiVI2bJcaGiT6acOwl6YzM93WL")
+	//@Value("${portone.imp_secret}")
 	private String apiSecret;
 
 	@Bean
@@ -20,3 +22,4 @@ public class IamportConfig {
 		return new IamportClient(apiKey, apiSecret);
 	}
 }
+

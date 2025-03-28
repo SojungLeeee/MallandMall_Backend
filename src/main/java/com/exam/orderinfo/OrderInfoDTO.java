@@ -1,5 +1,6 @@
 package com.exam.orderinfo;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -34,4 +35,5 @@ public class OrderInfoDTO {
 
 	private int orderPrice;
 
+	LocalDate orderDate = LocalDate.now();
 }

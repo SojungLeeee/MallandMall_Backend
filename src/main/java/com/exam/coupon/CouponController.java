@@ -47,4 +47,11 @@ public class CouponController {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		return authentication.getName();
 	}
+
+	//월초 쿠폰 발급 / 얘는 지금은 없어도 되는건가..?
+	//@GetMapping("/monthReward/{userId}")
+	// public void newMonthCoupon(@PathVariable String userId) {
+	// 	couponService.addMonthCoupon(userId);
+	// }
+
 }

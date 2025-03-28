@@ -34,9 +34,9 @@ public class CouponServiceImpl implements CouponService {
 	// 온라인 쿠폰 발급
 	@Override
 	public void addNewMemberOnlineCoupon(String userId) {
-		String couponName = "[온라인] 전상품 20% 할인 쿠폰";
+		String couponName = "[온라인] 5% 할인 쿠폰";
 		String minPrice = "30000";
-		String benefits = "20% 할인";
+		String benefits = "5% 할인";
 		String couponType = "online";
 
 		Coupon coupon = createCoupon(userId, couponName, minPrice, benefits, couponType);
@@ -46,9 +46,9 @@ public class CouponServiceImpl implements CouponService {
 	// 오프라인 쿠폰 발급
 	@Override
 	public void addNewMemberOfflineCoupon(String userId) {
-		String couponName = "[오프라인] 전상품 30% 할인 쿠폰";
+		String couponName = "[오프라인] 10% 할인 쿠폰";
 		String minPrice = "30000";
-		String benefits = "30% 할인";
+		String benefits = "10% 할인";
 		String couponType = "offline";
 
 		Coupon coupon = createCoupon(userId, couponName, minPrice, benefits, couponType);
@@ -81,6 +81,18 @@ public class CouponServiceImpl implements CouponService {
 	public void deleteExpiredCoupons(LocalDate now) {
 		// 유효기간이 지난 쿠폰을 삭제하는 로직
 		couponRepository.deleteByExpirationDateBefore(now);
+	}
+
+	//월1일 쿠폰 지급
+	@Override
+	public void addMonthCoupon(String userId) {
+		String couponName = "[오프라인] 20% 할인 쿠폰";
+		String minPrice = "30000";
+		String benefits = "20% 할인";
+		String couponType = "offline";
+
+		Coupon coupon = createCoupon(userId, couponName, minPrice, benefits, couponType);
+		couponRepository.save(coupon);
 	}
 
 }

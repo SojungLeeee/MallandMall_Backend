@@ -57,6 +57,28 @@ public class QuartzConfig {
 			.build();
 	}
 
+	// GiveMonthCouponJob 클래스 정의 (Spring 관리 빈으로 등록)
+	@Bean
+	public JobDetail giveMonthCouponJobDetail() {
+		return JobBuilder.newJob(GiveMonthCouponJob.class)  // Job 클래스 참조
+			.withIdentity("GiveMonthCouponJob", "DEFAULT")  // Job 이름과 그룹을 정확히 지정
+			.storeDurably()  // Job이 Quartz에 의해 지속적으로 저장되도록 설정
+			.build();
+	}
+
+	// Trigger 정의 (10초마다 실행)
+	@Bean
+	public Trigger giveMonthCheckJobTrigger() {
+		return TriggerBuilder.newTrigger()
+			.forJob(giveMonthCouponJobDetail())  // JobDetail과 연결
+			.withIdentity("GiveMonthCouponJobTrigger", "DEFAULT")  // Trigger 이름과 그룹을 지정
+			.withSchedule(CronScheduleBuilder.cronSchedule("0 0 1 * * ?")) // 매월 1일마다
+			.build();
+		//"0 * * * * ?" 1분
+		//"0 0 0 * * ?" 매일 자정
+		//"0 0 1 * * ?" 매월 1일
+	}
+
 	// SchedulerFactoryBean 설정
 	@Bean
 	public SchedulerFactoryBean scheduler() {
@@ -67,9 +89,11 @@ public class QuartzConfig {
 
 		// JobDetail과 Trigger를 스케줄러에 추가
 		schedulerFactoryBean.setJobDetails(expirationDateCheckJobDetail(),
-			couponExpirationCheckJobDetail());  // JobDetails 추가
+			couponExpirationCheckJobDetail(),
+			giveMonthCouponJobDetail());  // JobDetails 추가
 		schedulerFactoryBean.setTriggers(expirationDateCheckJobTrigger(),
-			couponExpirationCheckJobTrigger());  // Triggers 추가
+			couponExpirationCheckJobTrigger(),
+			giveMonthCheckJobTrigger());  // Triggers 추가
 
 		// 추가적인 설정 (옵션 설정)
 		schedulerFactoryBean.setWaitForJobsToCompleteOnShutdown(true); // 애플리케이션 종료시 작업 완료 대기

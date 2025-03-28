@@ -15,4 +15,7 @@ public interface CouponService {
 
 	//쿠폰 자동삭제 로직
 	void deleteExpiredCoupons(LocalDate now);
+
+	//월 5만원 이상 구매 시 월1일 쿠폰 지급
+	void addMonthCoupon(String userId);
 }

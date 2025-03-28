@@ -1,5 +1,7 @@
 package com.exam.order;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,4 +44,5 @@ public class OrderInfo {
 	@Column(nullable = false)
 	private int orderPrice;
 
+	LocalDate orderDate = LocalDate.now();
 }

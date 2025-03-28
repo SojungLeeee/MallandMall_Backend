@@ -1,6 +1,7 @@
 package com.exam.orderinfo;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,6 +64,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 						.phoneNumber(dto.getPhoneNumber())
 						.orderPrice(itemPrice)
 						.impUid(dto.getImpUid())
+						.orderDate(dto.getOrderDate())
 						.build();
 
 					orderInfoRepository.save(order);
@@ -101,6 +103,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 				.phoneNumber(dto.getPhoneNumber())
 				.orderPrice(orderPrice)
 				.impUid(dto.getImpUid())
+				.orderDate(dto.getOrderDate())
 				.build();
 
 			orderInfoRepository.save(order);
@@ -133,6 +136,12 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 		return orders.stream()
 			.map(this::convertToDTO)
 			.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<UserOrderInfo> getTotalPriceByUserForPeriod(LocalDate startDate, LocalDate endDate) {
+		// 사용자별로 총 금액을 계산하여 반환
+		return orderInfoRepository.sumOrderPriceByUserAndDateRange(startDate, endDate);
 	}
 
 	/*@Override

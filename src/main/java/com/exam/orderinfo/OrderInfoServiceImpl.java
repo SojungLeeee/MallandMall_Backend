@@ -175,6 +175,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 			.impUid(order.getImpUid())
 			.productName(product.getProductName()) // 상품명
 			.image(product.getImage()) // 상품 이미지 URL
+			.orderDate(order.getOrderDate())
 			.build();
 	}
 }

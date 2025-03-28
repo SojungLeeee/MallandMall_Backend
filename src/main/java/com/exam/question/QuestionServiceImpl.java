@@ -47,6 +47,23 @@ public class QuestionServiceImpl implements QuestionService {
 		// 답변 삭제
 		answerRepository.delete(answer);
 	}
+	@Override
+	@Transactional
+	public void deleteQuestion(String userId, Long questionId) {
+		// 해당 ID의 질문을 찾음
+		Question question = questionRepository.findById(questionId)
+			.orElseThrow(() -> new RuntimeException("질문을 찾을 수 없습니다."));
+
+		// 작성자 확인 (본인만 삭제 가능)
+		if (!question.getUserId().equals(userId)) {
+			throw new RuntimeException("본인의 질문만 삭제할 수 있습니다.");
+		}
+
+
+		// 질문 삭제
+		questionRepository.deleteById(questionId);
+
+	}
 
 	// 질문 수정
 	@Override
@@ -67,7 +84,19 @@ public class QuestionServiceImpl implements QuestionService {
 
 		questionRepository.save(question);
 	}
-
+	@Override
+	public List<QuestionDTO> getAllQuestions() {
+		// 모든 질문을 가져와서 DTO로 변환 후 반환
+		return questionRepository.findAll().stream()
+			.map(question -> new QuestionDTO(
+				question.getQuestionid(),  // questionid
+				question.getUserId(),      // userId
+				question.getTitle(),       // title
+				question.getContent(),     // content
+				question.getCreateDate(),  // createDate
+				question.getStatus().name()))  // status (enum을 문자열로 변환)
+			.collect(Collectors.toList());
+	}
 	// 특정 사용자의 질문 목록 조회
 	@Override
 	public List<QuestionDTO> getQuestionsByUser(String userId) {
@@ -78,4 +107,6 @@ public class QuestionServiceImpl implements QuestionService {
 			.map(q -> new QuestionDTO(q.getQuestionid(), q.getUserId(), q.getTitle(), q.getContent(), q.getCreateDate(), q.getStatus().name()))
 			.collect(Collectors.toList());
 	}
-}
+
+
+	}

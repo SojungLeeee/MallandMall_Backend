@@ -5,4 +5,6 @@ import java.util.List;
 
 public interface QuestionRepository extends JpaRepository<Question, Long> {
 	List<Question> findByUserId(String userId);
+
+
 }

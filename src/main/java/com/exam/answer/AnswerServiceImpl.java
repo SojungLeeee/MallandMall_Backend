@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import com.exam.question.QuestionDTO;  // QuestionDTO를 임포트
 @Service
 public class AnswerServiceImpl implements AnswerService {
 
@@ -29,7 +29,7 @@ public class AnswerServiceImpl implements AnswerService {
 	// 답변 추가
 	@Override
 	@Transactional
-	public void addAnswer(Long questionId, String userId, String content) {
+	public AnswerDTO addAnswer(Long questionId, String userId, String content) {
 		// 질문이 존재하는지 확인
 		Question question = questionRepository.findById(questionId)
 			.orElseThrow(() -> new RuntimeException("질문을 찾을 수 없습니다."));
@@ -52,12 +52,13 @@ public class AnswerServiceImpl implements AnswerService {
 
 		// 답변 저장
 		answerRepository.save(answer);
+		return null;
 	}
 
 	// 답변 수정
 	@Override
 	@Transactional
-	public void updateAnswer(Long answerId, String userId, String content) {
+	public AnswerDTO updateAnswer(Long answerId, String userId, String content) {
 		// 답변이 존재하는지 확인
 		Answer answer = answerRepository.findById(answerId)
 			.orElseThrow(() -> new RuntimeException("답변을 찾을 수 없습니다."));
@@ -72,8 +73,21 @@ public class AnswerServiceImpl implements AnswerService {
 
 		// 수정된 답변 저장
 		answerRepository.save(answer);
+		return null;
 	}
-
+	@Override
+	public List<QuestionDTO> getAllQuestions() {
+		// 모든 질문을 가져와서 DTO로 변환 후 반환
+		return questionRepository.findAll().stream()
+			.map(question -> new QuestionDTO(
+				question.getQuestionid(),  // questionid
+				question.getUserId(),      // userId
+				question.getTitle(),       // title
+				question.getContent(),     // content
+				question.getCreateDate(),  // createDate
+				question.getStatus().name()))  // status (enum을 문자열로 변환)
+			.collect(Collectors.toList());
+	}
 	// 답변 삭제
 	@Override
 	@Transactional

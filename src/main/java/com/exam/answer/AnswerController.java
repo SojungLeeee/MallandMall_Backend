@@ -1,5 +1,7 @@
 package com.exam.answer;
 
+import com.exam.question.QuestionDTO;
+import com.exam.question.QuestionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -15,30 +17,44 @@ import java.util.List;
 public class AnswerController {
 
 	private final AnswerService answerService;
+	private final QuestionService questionService;
 
 	// 답변 추가
 	@PostMapping("/add/{questionId}")
-	public ResponseEntity<String> addAnswer(@PathVariable Long questionId,
-		@RequestBody String content) {
+	public ResponseEntity<AnswerDTO> addAnswer(
+		@PathVariable Long questionId,
+		@RequestBody AnswerDTO answerDTO) {
 		try {
-			String adminId = getAuthenticatedUserId();  // 인증된 관리자 ID 가져오기
-			answerService.addAnswer(questionId, adminId, content);
-			return ResponseEntity.status(HttpStatus.CREATED).body("답변이 성공적으로 등록되었습니다.");
+			String adminId = getAuthenticatedUserId();
+			AnswerDTO savedAnswer = answerService.addAnswer(questionId, adminId, answerDTO.getContent());
+			return ResponseEntity.status(HttpStatus.CREATED).body(savedAnswer);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+		}
+	}
+
+	// 모든 질문 조회
+	@GetMapping("/all")
+	public ResponseEntity<List<QuestionDTO>> getAllQuestions() {
+		try {
+			List<QuestionDTO> questions = questionService.getAllQuestions();
+			return ResponseEntity.ok(questions);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}
 	}
 
 	// 답변 수정
 	@PutMapping("/update/{answerId}")
-	public ResponseEntity<String> updateAnswer(@PathVariable Long answerId,
-		@RequestBody String content) {
+	public ResponseEntity<AnswerDTO> updateAnswer(
+		@PathVariable Long answerId,
+		@RequestBody AnswerDTO answerDTO) {
 		try {
-			String adminId = getAuthenticatedUserId();  // 인증된 관리자 ID 가져오기
-			answerService.updateAnswer(answerId, adminId, content);
-			return ResponseEntity.ok("답변이 성공적으로 수정되었습니다.");
+			String adminId = getAuthenticatedUserId();
+			AnswerDTO updatedAnswer = answerService.updateAnswer(answerId, adminId, answerDTO.getContent());
+			return ResponseEntity.ok(updatedAnswer);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}
 	}
 
@@ -52,22 +68,22 @@ public class AnswerController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 	}
+
 	// 답변 삭제
 	@DeleteMapping("/delete/{answerId}")
 	public ResponseEntity<String> deleteAnswer(@PathVariable Long answerId) {
 		try {
-			String adminId = getAuthenticatedUserId();  // 인증된 관리자 ID 가져오기
-			answerService.deleteAnswer(answerId, adminId);  // userId 추가
+			String adminId = getAuthenticatedUserId();
+			answerService.deleteAnswer(answerId, adminId);
 			return ResponseEntity.ok("답변이 삭제되었습니다.");
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 	}
 
-
 	// 인증된 관리자 ID를 가져오는 메서드
 	private String getAuthenticatedUserId() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		return authentication.getName();  // Spring Security에서 인증된 사용자의 이름(아이디) 반환
+		return authentication.getName();
 	}
 }

@@ -3,7 +3,6 @@ package com.exam.adminbranch;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/map")
-@CrossOrigin(origins = "*") // 실제 환경에서는 특정 도메인으로 제한하도록 해야한다. 나중에 설정
 public class MapApiController {
 
 	private final BranchService branchService;

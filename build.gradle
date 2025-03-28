@@ -65,6 +65,12 @@ dependencies {
 
     //유통기한 관리 Quartz
     implementation 'org.springframework.boot:spring-boot-starter-quartz:3.2.8'
+
+    // Jackson JSON 처리
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+// WebClient (선택적)
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 

@@ -26,7 +26,7 @@ public class AnswerController {
 		@RequestBody AnswerDTO answerDTO) {
 		try {
 			String adminId = getAuthenticatedUserId();
-			AnswerDTO savedAnswer = answerService.addAnswer(questionId, adminId, answerDTO.getContent());
+			AnswerDTO savedAnswer = answerService.addAnswer(questionId, adminId, answerDTO.getContent(), answerDTO.getStatus());
 			return ResponseEntity.status(HttpStatus.CREATED).body(savedAnswer);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

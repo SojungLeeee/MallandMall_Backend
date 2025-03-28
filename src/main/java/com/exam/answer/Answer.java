@@ -29,6 +29,9 @@ public class Answer {
 	@Column(nullable = false)
 	private String userId;
 
+	@Column(nullable = false)
+	private String status;  // 답변 상태
+
 	@CreatedDate  // 자동으로 현재 날짜 설정
 	@Column(updatable = false, nullable = false)
 	private LocalDateTime createDate;

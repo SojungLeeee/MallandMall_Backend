@@ -45,7 +45,6 @@ public class QuestionController {
 		}
 	}
 
-
 	// 특정 사용자가 쓴 질문만 조회
 	@GetMapping("/{userId}")
 	public ResponseEntity<List<QuestionDTO>> getQuestionsByUser(@PathVariable String userId) {

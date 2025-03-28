@@ -27,9 +27,9 @@ public class AnswerServiceImpl implements AnswerService {
 	}
 
 	// 답변 추가
-	@Override
 	@Transactional
-	public AnswerDTO addAnswer(Long questionId, String userId, String content) {
+	@Override
+	public AnswerDTO addAnswer(Long questionId, String userId, String content, String status) {
 		// 질문이 존재하는지 확인
 		Question question = questionRepository.findById(questionId)
 			.orElseThrow(() -> new RuntimeException("질문을 찾을 수 없습니다."));
@@ -42,12 +42,15 @@ public class AnswerServiceImpl implements AnswerService {
 		if (!Role.fromString(String.valueOf(user.getRole())).equals(Role.ADMIN)) {  // Role에서 문자열을 enum으로 변환하여 비교
 			throw new RuntimeException("관리자만 답변을 작성할 수 있습니다.");
 		}
+   // 기본값으로 'ACTIVE' 설정 또는 클라이언트로부터 받은 값을 설정
+		String answerStatus = (status != null) ? status : "ACTIVE";  // status가 null이면 'ACTIVE'로 기본 설정
 
 		// 답변 생성
 		Answer answer = Answer.builder()
 			.questionId(questionId)  // 실제 질문 ID를 설정
 			.content(content)         // 답변 내용
 			.userId(userId)
+			.status(answerStatus)  // status 추가
 			.build();
 
 		// 답변 저장
@@ -119,7 +122,8 @@ public class AnswerServiceImpl implements AnswerService {
 					answer.getQuestionId(), // 질문 ID만 사용
 					answer.getContent(),    // 답변 내용
 					answer.getUserId(),     // 답변을 작성한 관리자 userId
-					answer.getCreateDate()  // 답변 작성일
+					answer.getCreateDate() , // 답변 작성일
+					answer.getStatus()
 				);
 			})
 			.collect(Collectors.toList());

@@ -19,4 +19,5 @@ public class AnswerDTO {
 	private String content;  // 답변 내용
 	private String userId;  // 답변을 작성한 관리자 userId
 	private LocalDateTime createDate;  // 답변 작성일
+	private String status;  // status 필드 추가
 }

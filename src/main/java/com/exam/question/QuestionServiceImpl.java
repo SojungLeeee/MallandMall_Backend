@@ -47,6 +47,7 @@ public class QuestionServiceImpl implements QuestionService {
 		// 답변 삭제
 		answerRepository.delete(answer);
 	}
+
 	@Override
 	@Transactional
 	public void deleteQuestion(String userId, Long questionId) {
@@ -58,7 +59,6 @@ public class QuestionServiceImpl implements QuestionService {
 		if (!question.getUserId().equals(userId)) {
 			throw new RuntimeException("본인의 질문만 삭제할 수 있습니다.");
 		}
-
 
 		// 질문 삭제
 		questionRepository.deleteById(questionId);
@@ -84,6 +84,7 @@ public class QuestionServiceImpl implements QuestionService {
 
 		questionRepository.save(question);
 	}
+
 	@Override
 	public List<QuestionDTO> getAllQuestions() {
 		// 모든 질문을 가져와서 DTO로 변환 후 반환
@@ -97,6 +98,7 @@ public class QuestionServiceImpl implements QuestionService {
 				question.getStatus().name()))  // status (enum을 문자열로 변환)
 			.collect(Collectors.toList());
 	}
+
 	// 특정 사용자의 질문 목록 조회
 	@Override
 	public List<QuestionDTO> getQuestionsByUser(String userId) {
@@ -104,9 +106,9 @@ public class QuestionServiceImpl implements QuestionService {
 
 		// 엔티티 리스트를 DTO 리스트로 변환
 		return questions.stream()
-			.map(q -> new QuestionDTO(q.getQuestionid(), q.getUserId(), q.getTitle(), q.getContent(), q.getCreateDate(), q.getStatus().name()))
+			.map(q -> new QuestionDTO(q.getQuestionid(), q.getUserId(), q.getTitle(), q.getContent(), q.getCreateDate(),
+				q.getStatus().name()))
 			.collect(Collectors.toList());
 	}
 
-
-	}
+}

@@ -41,17 +41,25 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 			int paidAmount = response.getResponse().getAmount().intValue();
 
 			if (dto.getOrders() != null && !dto.getOrders().isEmpty()) {
-				int totalExpectedAmount = 0;
+				// 개별 상품에 대한 주문 저장
 				for (ProductOrderDTO item : dto.getOrders()) {
 					Product product = productRepository.findByProductCode(item.getProductCode());
 					if (product == null) {
-						log.warn(" 상품을 찾을 수 없습니다: {}", item.getProductCode());
+						log.warn(" 상품을 찾을 수 없습니다22: {}", item.getProductCode());
 						return false;
 					}
 
-					int itemPrice = product.getPrice() * item.getQuantity();
-					totalExpectedAmount += itemPrice;
+					// 실제 결제된 금액을 기준으로 처리
+					//int itemPrice = paidAmount / dto.getOrders().size(); // 예시: 결제된 금액을 주문 개수로 나누어 분배
+					//int itemPrice = product.getPrice() * item.getQuantity();
+					// 할인된 가격을 사용
+					int originalPrice = product.getPrice() * item.getQuantity(); // 원래 가격 계산
+					int discountPercent = dto.getDiscountedPrice(); // 할인 비율
 
+					// 할인된 가격 계산 후 바로 int 형으로 변환 (소수점 버림)
+					int itemPrice = (int)(originalPrice - (originalPrice * (discountPercent / 100.0)));
+					System.out.println("할인비율 : " + dto.getDiscountedPrice());
+					System.out.println("할인된 가격 : " + itemPrice);
 					// 개별 주문 저장
 					OrderInfo order = OrderInfo.builder()
 						.userId(dto.getUserId())
@@ -62,7 +70,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 						.addr1(dto.getAddr1())
 						.addr2(dto.getAddr2())
 						.phoneNumber(dto.getPhoneNumber())
-						.orderPrice(itemPrice)
+						.orderPrice(itemPrice)  // 실제 결제 금액으로 저장
 						.impUid(dto.getImpUid())
 						.orderDate(dto.getOrderDate())
 						.build();
@@ -70,26 +78,18 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 					orderInfoRepository.save(order);
 				}
 
-				if (paidAmount != totalExpectedAmount) {
-					log.warn("❌ 금액 불일치: 기대값 = {}, 실제 결제 = {}", totalExpectedAmount, paidAmount);
-					return false;
-				}
-
 				return true;
 			}
 
 			Product product = productRepository.findByProductCode(dto.getProductCode());
+			System.out.println("선택된 product : " + product);
 			if (product == null) {
-				log.warn(" 상품을 찾을 수 없습니다.");
+				log.warn(" 상품을 찾을 수 없습니다111.");
 				return false;
 			}
 
-			int expectedAmount = product.getPrice() * dto.getQuantity();
-			int orderPrice = product.getPrice() * dto.getQuantity();
-			if (paidAmount != expectedAmount) {
-				log.warn(" 금액 불일치: 기대값 = {}, 실제 결제 = {}", expectedAmount, paidAmount);
-				return false;
-			}
+			// 실제 결제된 금액을 사용
+			int orderPrice = paidAmount;
 
 			// 주문 저장
 			OrderInfo order = OrderInfo.builder()
@@ -101,7 +101,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 				.addr1(dto.getAddr1())
 				.addr2(dto.getAddr2())
 				.phoneNumber(dto.getPhoneNumber())
-				.orderPrice(orderPrice)
+				.orderPrice(orderPrice)  // 실제 결제 금액으로 저장
 				.impUid(dto.getImpUid())
 				.orderDate(dto.getOrderDate())
 				.build();

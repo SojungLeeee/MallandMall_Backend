@@ -34,6 +34,8 @@ public class OrderInfoDTO {
 	private String impUid;
 
 	private int orderPrice;
+	private int discountedPrice; // 할인된 가격
 
+	String selectedCoupon; // 추가된 부분 (쿠폰 정보)
 	LocalDate orderDate = LocalDate.now();
 }

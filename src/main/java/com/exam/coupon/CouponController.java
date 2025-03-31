@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,5 +54,15 @@ public class CouponController {
 	// public void newMonthCoupon(@PathVariable String userId) {
 	// 	couponService.addMonthCoupon(userId);
 	// }
+
+	@DeleteMapping("/delete/{couponId}")
+	public ResponseEntity<String> deleteCoupon(@PathVariable Integer couponId) {
+		try {
+			couponService.deleteByCouponId(couponId);
+			return ResponseEntity.ok("사용한 쿠폰이 삭제되었습니다.");
+		} catch (Exception e) {
+			return ResponseEntity.status(500).body("쿠폰 삭제에 실패했습니다.");
+		}
+	}
 
 }

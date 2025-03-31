@@ -1,8 +1,9 @@
 package com.exam.Cart;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 
 import com.exam.product.Product;
 import com.exam.product.ProductRepository;
@@ -79,5 +80,13 @@ public class CartServiceImpl implements CartService {
 
 		cartItem.setQuantity(quantity);
 		return cartRepository.save(cartItem);
+	}
+
+	// 여러 개의 cartId를 받아서 삭제하는 메서드
+	@Override
+	@Transactional
+	public void deleteByCartIdIn(List<Integer> cartIds) {
+		// cartIds 리스트에 해당하는 cartId들을 가진 장바구니 항목들을 삭제
+		cartRepository.deleteByCartIdIn(cartIds);
 	}
 }

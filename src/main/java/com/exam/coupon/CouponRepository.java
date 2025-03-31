@@ -13,4 +13,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Integer> {
 
 	// 유효기간이 주어진 날짜 이전인 쿠폰을 삭제
 	void deleteByExpirationDateBefore(LocalDate now);
+
+	//주문 완료 후 쿠폰 삭제
+	void deleteByCouponId(Integer couponId);
 }

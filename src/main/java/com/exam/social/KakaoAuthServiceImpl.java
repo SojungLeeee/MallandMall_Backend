@@ -5,7 +5,12 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -14,8 +19,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.exam.security.JwtTokenService;
+import com.exam.coupon.CouponService;
 import com.exam.security.JwtTokenResponse;
+import com.exam.security.JwtTokenService;
 import com.exam.user.User;
 import com.exam.user.UserRepository;
 
@@ -28,6 +34,7 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
 	private final RestTemplate restTemplate;
 	private final UserRepository userRepository;
 	private final JwtTokenService jwtTokenService;
+	private final CouponService couponService;
 
 	@Value("${kakao.client-id}")
 	private String clientId;
@@ -58,7 +65,7 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
 			System.out.println("🔹 카카오 토큰 응답: " + response.getBody());
 
 			if (response.getStatusCode() == HttpStatus.OK) {
-				return (String) response.getBody().get("access_token");
+				return (String)response.getBody().get("access_token");
 			} else {
 				throw new RuntimeException(" 카카오 액세스 토큰 요청 실패: " + response.getBody());
 			}
@@ -76,11 +83,11 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
 		HttpEntity<Void> request = new HttpEntity<>(headers);
 		ResponseEntity<Map> response = restTemplate.exchange(userUrl, HttpMethod.GET, request, Map.class);
 
-		Map<String, Object> kakaoAccount = (Map<String, Object>) response.getBody().get("kakao_account");
-		Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+		Map<String, Object> kakaoAccount = (Map<String, Object>)response.getBody().get("kakao_account");
+		Map<String, Object> profile = (Map<String, Object>)kakaoAccount.get("profile");
 
 		KakaoUserDTO kakaoUser = new KakaoUserDTO();
-		kakaoUser.setId((Long) response.getBody().get("id"));
+		kakaoUser.setId((Long)response.getBody().get("id"));
 		kakaoUser.setEmail(kakaoAccount.getOrDefault("email", "").toString());
 		kakaoUser.setNickname(profile.getOrDefault("nickname", "카카오 사용자").toString());
 
@@ -105,6 +112,8 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
 				user.setEmail(kakaoUser.getEmail());
 				user.setKakaoId(kakaoUser.getId());
 				userRepository.save(user);
+				couponService.addNewMemberOnlineCoupon(user.getUserId());
+				couponService.addNewMemberOfflineCoupon(user.getUserId());
 			}
 
 			UsernamePasswordAuthenticationToken authentication =

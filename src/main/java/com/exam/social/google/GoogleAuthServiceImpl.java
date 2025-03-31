@@ -1,5 +1,9 @@
 package com.exam.social.google;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,15 +14,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.exam.coupon.CouponService;
 import com.exam.security.JwtTokenResponse;
 import com.exam.security.JwtTokenService;
-import com.exam.user.UserDTO;
 import com.exam.user.Role;
+import com.exam.user.UserDTO;
 import com.exam.user.UserService;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @Service
 public class GoogleAuthServiceImpl implements GoogleAuthService {
@@ -32,11 +33,14 @@ public class GoogleAuthServiceImpl implements GoogleAuthService {
 	private final UserService userService;
 	private final JwtTokenService jwtTokenService;
 	private final PasswordEncoder passwordEncoder;
+	private final CouponService couponService;
 
-	public GoogleAuthServiceImpl(UserService userService, JwtTokenService jwtTokenService, PasswordEncoder passwordEncoder) {
+	public GoogleAuthServiceImpl(UserService userService, JwtTokenService jwtTokenService,
+		PasswordEncoder passwordEncoder, CouponService couponService) {
 		this.userService = userService;
 		this.jwtTokenService = jwtTokenService;
 		this.passwordEncoder = passwordEncoder;
+		this.couponService = couponService;
 		this.webClient = WebClient.create();
 	}
 
@@ -87,6 +91,11 @@ public class GoogleAuthServiceImpl implements GoogleAuthService {
 				logger.info("New user registered via Google: {}", email);
 
 				user = newUser;
+
+				System.out.println("user 정보 : " + user);
+
+				couponService.addNewMemberOnlineCoupon(user.getUserId());
+				couponService.addNewMemberOfflineCoupon(user.getUserId());
 			}
 
 			// JWT 토큰 생성

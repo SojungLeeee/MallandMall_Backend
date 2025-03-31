@@ -18,4 +18,7 @@ public interface CouponService {
 
 	//월 5만원 이상 구매 시 월1일 쿠폰 지급
 	void addMonthCoupon(String userId);
+
+	//주문 완료 후 쿠폰 삭제
+	void deleteByCouponId(Integer couponId);
 }

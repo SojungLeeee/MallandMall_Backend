@@ -6,6 +6,9 @@ public interface BranchService {
 	//모든 지점 조회
 	List<Branch> getAllBranches();
 
+	//특정 지점 조회
+	Branch getBranchByName(String branchName);
+
 	//지점 추가
 	Branch createBranches(Branch branch);
 
@@ -16,6 +19,12 @@ public interface BranchService {
 	void deleteBranches(Branch branch, String branchName);
 
 	// 추가: 지도 API용 메소드
-	List<BranchLocationDTO> getAllBranchesWithGoodsCount();
-	BranchLocationDTO getBranchDetailWithGoods(String branchName);
-}
+	//특정 상품을 보유한 지점 목록 조회
+	List<BranchLocationDTO> getBranchesWithProduct(String productCode);
+
+	//지점명 또는 주소로 검색
+	List<BranchLocationDTO> searchBranches(String keyword);
+
+
+	}
+

@@ -31,4 +31,6 @@ public class Branch {
 
 	@Column
 	Double longitude;
+
+
 }

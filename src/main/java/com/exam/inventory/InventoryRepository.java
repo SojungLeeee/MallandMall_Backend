@@ -29,5 +29,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
 	// productCode와 branchName으로 Inventory를 조회
 	Inventory findByProductCodeAndBranchName(String productCode, String branchName);
 
+	// 특정 상품 코드에 대한 인벤토리 조회
 	List<Inventory> findByProductCode(String productCode);
+
 }

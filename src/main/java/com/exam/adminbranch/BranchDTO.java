@@ -15,7 +15,6 @@ import lombok.ToString;
 @Setter
 @ToString
 @Builder
-@Entity
 public class BranchDTO {
 	@Id
 	String branchName;

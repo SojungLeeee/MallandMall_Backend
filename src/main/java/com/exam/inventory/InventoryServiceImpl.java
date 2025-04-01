@@ -1,6 +1,8 @@
 package com.exam.inventory;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -60,5 +62,21 @@ public class InventoryServiceImpl implements InventoryService {
 
 		return inventoryDTOList;
 	}
+
+
+	// 특정 상품의 지점별 수량 조회 메소드
+	@Override
+	public Map<String, Integer> findQuantityByProductCode(String productCode) {
+		List<Inventory> inventories = inventoryRepository.findByProductCode(productCode);
+		Map<String, Integer> branchQuantities = new HashMap<>();
+
+		for (Inventory inventory : inventories) {
+			branchQuantities.put(inventory.getBranchName(), inventory.getQuantity());
+		}
+
+		return branchQuantities;
+	}
+
+
 
 }

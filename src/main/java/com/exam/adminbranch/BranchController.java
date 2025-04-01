@@ -1,6 +1,7 @@
 package com.exam.adminbranch;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -15,14 +16,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.exam.inventory.InventoryService;
+
 @RestController
 @RequestMapping("/admin/branch")
 public class BranchController {
 
 	private final BranchService branchService;
+	private final InventoryService inventoryService;
 
-	public BranchController(BranchService branchService) {
+	public BranchController(BranchService branchService, InventoryService inventoryService) {
 		this.branchService = branchService;
+		this.inventoryService = inventoryService;
 	}
 
 	//모든 지점 조회
@@ -34,6 +39,8 @@ public class BranchController {
 				.map(branch -> BranchDTO.builder()
 					.branchName(branch.getBranchName())
 					.branchAddress(branch.getBranchAddress())
+					.latitude(branch.getLatitude())
+					.longitude(branch.getLongitude())
 					.build())
 				.collect(Collectors.toList());
 
@@ -44,7 +51,8 @@ public class BranchController {
 		}
 	}
 
-	//DTO 가져와서 쓰려면 RequestBody로 받아야한다.RequestBody는 객체 받아올때 사용한다.
+
+
 	//지점 생성
 	 @PostMapping("/create")
 	 public ResponseEntity<?> createBranch(@RequestBody BranchDTO branchDTO){
@@ -53,6 +61,8 @@ public class BranchController {
 			Branch branch = Branch.builder()
 				.branchName(branchDTO.getBranchName())
 				.branchAddress(branchDTO.getBranchAddress())
+				.latitude(branchDTO.getLatitude())
+				.longitude(branchDTO.getLongitude())
 				.build();
 			//2. 브랜치서비스의 비즈니스 로직 가져오기
 			Branch createdBranch = branchService.createBranches(branch);
@@ -110,6 +120,25 @@ public class BranchController {
 		} catch (Exception e){
 			return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 				.body("지점 삭제 중 오류가 발생했습니다: " + e.getMessage());
+		}
+	}
+
+	// 특정 상품에 대한 지점별 수량 조회
+	@GetMapping("/product/{productCode}")
+	public ResponseEntity<?> getBranchesWithProduct(@PathVariable String productCode) {
+		try {
+			List<BranchLocationDTO> branches = branchService.getBranchesWithProduct(productCode);
+			return ResponseEntity.ok(branches);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.body("상품별 지점 목록을 가져오는 중 오류가 발생했습니다: " + e.getMessage());
+		}
+	}
+
+	//커스텀 예외(지점 수정에서 사용 중)
+	public class BranchNotFoundException extends RuntimeException {
+		public BranchNotFoundException(String message) {
+			super(message);
 		}
 	}
 }

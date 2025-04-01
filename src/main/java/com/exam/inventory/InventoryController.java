@@ -72,4 +72,13 @@ public class InventoryController {
 			return ResponseEntity.status(404).body(null); // You can customize this as per your error handling logic
 		}
 	}
+
+	// 특정 상품 코드에 대한 지점별 수량 조회 API
+	@GetMapping("/product/{productCode}/branches")
+	public ResponseEntity<Map<String, Integer>> getQuantityByProductCode(@PathVariable String productCode) {
+		Map<String, Integer> branchQuantities = inventoryService.findQuantityByProductCode(productCode);
+		return ResponseEntity.ok(branchQuantities);
+	}
+
+
 }

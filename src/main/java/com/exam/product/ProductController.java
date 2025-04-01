@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -60,6 +61,27 @@ public class ProductController {
 
 		List<ProductDTO> productDTOs = productService.getProductsByUserId(userId);
 		return ResponseEntity.ok(productDTOs);
+	}
+
+	@GetMapping("/search")
+	public ResponseEntity<List<ProductDTO>> searchProducts(
+		@RequestParam String searchType,
+		@RequestParam String keyword) {
+
+		List<ProductDTO> products;
+
+		if ("productName".equals(searchType)) {
+			// 기존의 상품명으로 검색하는 서비스 메소드 활용
+			products = productService.getProductsByName(keyword);
+		} else if ("category".equals(searchType)) {
+			// 기존의 카테고리별 상품 조회 서비스 메소드 활용
+			products = productService.getProductsByCategory(keyword);
+		} else {
+			// 유효하지 않은 검색 타입인 경우
+			return ResponseEntity.badRequest().build();
+		}
+
+		return (products.isEmpty()) ? ResponseEntity.noContent().build() : ResponseEntity.ok(products);
 	}
 
 }

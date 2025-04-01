@@ -1,6 +1,7 @@
 package com.exam.inventory;
 
 import java.util.List;
+import java.util.Map;
 
 public interface InventoryService {
 
@@ -9,4 +10,7 @@ public interface InventoryService {
 	List<InventoryDTO> findAllInventory();
 
 	List<InventoryDTO> findByProductCode(String productCode);
+
+	// 지점별 특정 상품 수량 조회 메소드
+	Map<String, Integer> findQuantityByProductCode(String productCode);
 }

@@ -78,7 +78,7 @@ public class JwtSecurityFilterChainConfig {
 			// OPTIONS 메서드에 대한 요청도 인증 없이 허용
 
 			//Google 로그인 API 경로 추가
-			.requestMatchers("/auth/google").permitAll()
+			.requestMatchers("/auth/google", "/offprice/**").permitAll()
 			.requestMatchers("/product/**", "/review/**", "/order/**", "/admin/**","/auth/kakao").permitAll()
 			.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 			.anyRequest().authenticated()  // 그 외의 요청은 인증 필요

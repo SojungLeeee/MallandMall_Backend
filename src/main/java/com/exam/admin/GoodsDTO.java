@@ -33,4 +33,7 @@ public class GoodsDTO {
 	@NotNull(message = "expirationDate는 필수입니다.")
 	private LocalDateTime expirationDate;  // expirationDate는 필수 항목
 
+	@NotNull(message = "quantity는 필수입니다.")
+	private Integer quantity;  // 입고 개수 추가
+
 }

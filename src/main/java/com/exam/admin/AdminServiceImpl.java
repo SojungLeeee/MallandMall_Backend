@@ -44,32 +44,34 @@ public class AdminServiceImpl implements AdminService {
 
 		// 지점이 존재하지 않으면, 외래키 제약 조건 오류 발생
 		if (!branch.isPresent()) {
-			throw new RuntimeException("존재하지 않는 지점명입니다. 지점명을 확인해주세요." + goodsDTO.getBranchName());
+			throw new RuntimeException("존재하지 않는 지점명입니다. 지점명을 확인해주세요: " + goodsDTO.getBranchName());
 		}
 
-		// 2. 지점이 존재하면 Goods 추가
-		Goods goods = Goods.builder()
-			.productCode(goodsDTO.getProductCode())
-			.branchName(goodsDTO.getBranchName())
-			.expirationDate(goodsDTO.getExpirationDate())
-			.build();
-		adminRepositoryGoods.save(goods);
+		// 2. Goods를 quantity 개수만큼 반복하여 추가
+		for (int i = 0; i < goodsDTO.getQuantity(); i++) {
+			Goods goods = Goods.builder()
+				.productCode(goodsDTO.getProductCode())
+				.branchName(goodsDTO.getBranchName())
+				.expirationDate(goodsDTO.getExpirationDate())
+				.build();
+			adminRepositoryGoods.save(goods);  // 상품 정보를 DB에 저장
+		}
 
 		// 3. Inventory 테이블에서 해당 productCode와 branchName을 가진 레코드 확인
 		Inventory inventory = inventoryRepository.findByProductCodeAndBranchName(
 			goodsDTO.getProductCode(), goodsDTO.getBranchName());
 
+		// 4. 해당하는 Inventory 레코드가 없다면 새로 생성
 		if (inventory == null) {
-			// 4. Inventory에 해당 레코드가 없으면 새로 추가 (quantity는 1로 설정)
 			Inventory newInventory = Inventory.builder()
 				.productCode(goodsDTO.getProductCode())
 				.branchName(goodsDTO.getBranchName())
-				.quantity(1) // 처음 들어온 상품이므로 quantity는 1
+				.quantity(goodsDTO.getQuantity())  // 입고 개수만큼 초기화
 				.build();
-			inventoryRepository.save(newInventory);
+			inventoryRepository.save(newInventory);  // 새로 생성된 재고 정보 저장
 		} else {
-			// 5. Inventory에 해당 레코드가 있으면 수량을 1 증가시킴
-			inventory.setQuantity(inventory.getQuantity() + 1); // quantity 1 증가
+			// 5. 해당하는 Inventory 레코드가 있다면 수량을 입고 개수만큼 증가
+			inventory.setQuantity(inventory.getQuantity() + goodsDTO.getQuantity());  // 입고 개수만큼 수량 증가
 			inventoryRepository.save(inventory);  // 갱신된 정보 저장
 		}
 	}

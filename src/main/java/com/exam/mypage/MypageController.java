@@ -43,6 +43,7 @@ public class MypageController {
 			SecurityContextHolder.getContext().getAuthentication();
 
 		String userId = authentication.getName();
+
 		if (userId == null) {
 			return ResponseEntity.status(401).body("인증되지 않은 사용자");
 		}

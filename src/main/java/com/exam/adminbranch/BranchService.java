@@ -25,6 +25,8 @@ public interface BranchService {
 	//지점명 또는 주소로 검색
 	List<BranchLocationDTO> searchBranches(String keyword);
 
+	// navermap - 가까운 지점 찾기
+	BranchDTO findNearestBranch(Double latitude, Double longitude);
 
 	}
 

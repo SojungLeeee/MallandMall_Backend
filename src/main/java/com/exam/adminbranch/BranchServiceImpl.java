@@ -153,6 +153,56 @@ public class BranchServiceImpl implements BranchService {
 			.collect(Collectors.toList());
 	}
 
+	@Override
+	public BranchDTO findNearestBranch(Double latitude, Double longitude) {
+		if(latitude == null || longitude == null){
+			throw new IllegalArgumentException("위도와 경도가 필요합니다");
+		}
+
+		List<Branch> branches = branchRepository.findAll();
+		Branch nearestBranch = null;
+		double minDistance = Double.MAX_VALUE;
+
+		for (Branch branch : branches) {
+			if (branch.getLatitude() != null && branch.getLongitude() != null){
+				double distance = calculateDistance(
+					latitude, longitude,
+					branch.getLatitude(), branch.getLongitude()
+				);
+				if (distance < minDistance){
+					minDistance = distance;
+					nearestBranch = branch;
+				}
+			}
+		}
+		if (nearestBranch == null){
+			throw new RuntimeException("유효한 위치 정보가 있는 지점을 찾을 수 없습니다");
+		}
+
+		//DTO 로 변환하고 거리 정보 추가
+		BranchDTO branchDTO = BranchDTO.builder()
+			.branchName(nearestBranch.getBranchName())
+			.branchAddress(nearestBranch.getBranchAddress())
+			.latitude(nearestBranch.getLatitude())
+			.longitude(nearestBranch.getLongitude())
+			.distance(minDistance)
+			.build();
+
+		return  branchDTO;
+	}
+
+	// 두 지점 간의 거리 계산 메소드 (Haversine 공식)
+	private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+		final int R = 6371; // 지구의 반지름 (km)
+		double latDistance = Math.toRadians(lat2 - lat1);
+		double lonDistance = Math.toRadians(lon2 - lon1);
+		double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+			+ Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+			* Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+		return R * c;
+	}
+
 	//커스텀 예외(지점 수정에서 사용 중)
 	public class BranchNotFoundException extends RuntimeException {
 		public BranchNotFoundException(String message) {
@@ -160,3 +210,4 @@ public class BranchServiceImpl implements BranchService {
 		}
 	}
 }
+

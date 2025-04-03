@@ -4,9 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -80,5 +83,39 @@ public class InventoryController {
 		return ResponseEntity.ok(branchQuantities);
 	}
 
+	// 특정 지점의 특정 상품 재고 확인
+	@GetMapping("/product/{productCode}/branch/{branchName}")
+	public ResponseEntity<Integer> getProductQuantityInBranch(
+		@PathVariable String productCode,
+		@PathVariable String branchName) {
+
+		try {
+			InventoryDTO inventory = inventoryService.findByProductCodeAndBranchName(productCode, branchName);
+			return ResponseEntity.ok(inventory.getQuantity());
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
+		}
+	}
+
+	// 재고 업데이트 (차감)
+	@PostMapping("/update")
+	public ResponseEntity<?> updateInventory(@RequestBody InventoryDTO inventoryDTO) {
+		try {
+			boolean success = inventoryService.updateInventory(
+				inventoryDTO.getBranchName(),
+				inventoryDTO.getProductCode(),
+				inventoryDTO.getQuantity()  // 양수: 재고 추가, 음수: 재고 차감
+			);
+
+			if (success) {
+				return ResponseEntity.ok().body("재고가 성공적으로 업데이트되었습니다");
+			} else {
+				return ResponseEntity.badRequest().body("재고 업데이트 실패");
+			}
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.body("재고 업데이트 중 오류 발생: " + e.getMessage());
+		}
+	}
 
 }

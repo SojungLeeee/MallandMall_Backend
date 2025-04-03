@@ -13,4 +13,6 @@ public interface InventoryService {
 
 	// 지점별 특정 상품 수량 조회 메소드
 	Map<String, Integer> findQuantityByProductCode(String productCode);
+	// 재고 업데이트 메서드
+	boolean updateInventory(String branchName, String productCode, int quantityChange);
 }

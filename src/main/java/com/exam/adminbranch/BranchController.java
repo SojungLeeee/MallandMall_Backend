@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,6 +23,7 @@ import com.exam.inventory.InventoryService;
 @RequestMapping("/admin/branch")
 public class BranchController {
 
+	@Autowired
 	private final BranchService branchService;
 	private final InventoryService inventoryService;
 
@@ -134,6 +136,26 @@ public class BranchController {
 				.body("상품별 지점 목록을 가져오는 중 오류가 발생했습니다: " + e.getMessage());
 		}
 	}
+
+	// 가장 가까운 매장 찾기
+	@PostMapping("nearest")
+	public ResponseEntity<?> findNearestBranch(@RequestBody CoordinateDTO coordinateDTO){
+		try{
+			BranchDTO nearestBranch = branchService.findNearestBranch(
+				coordinateDTO.getLatitude(),
+				coordinateDTO.getLongitude()
+			);
+			return ResponseEntity.ok(nearestBranch);
+		}catch (Exception e){
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.body("가장 가까운 지점을 찾는 중 오류가 발생했습니다: " + e.getMessage());
+		}
+	}
+
+
+
+
+
 
 	//커스텀 예외(지점 수정에서 사용 중)
 	public class BranchNotFoundException extends RuntimeException {

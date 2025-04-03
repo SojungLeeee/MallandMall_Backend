@@ -30,9 +30,11 @@ public class InventoryController {
 		*/
 
 	InventoryService inventoryService;
+	InventoryLogService inventoryLogService;
 
-	public InventoryController(InventoryService inventoryService) {
+	public InventoryController(InventoryService inventoryService, InventoryLogService inventoryLogService) {
 		this.inventoryService = inventoryService;
+		this.inventoryLogService = inventoryLogService;
 	}
 
 	//인벤토리 전체보기
@@ -116,6 +118,33 @@ public class InventoryController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 				.body("재고 업데이트 중 오류 발생: " + e.getMessage());
 		}
+	}
+
+	// 상품별 지점별 재고 히스토리 조회 (관리자용)
+	@GetMapping("/log/{productCode}/{branchName}")
+	public ResponseEntity<List<InventoryLogDTO>> getStockHistoryByProductAndBranch(
+		@PathVariable String productCode,
+		@PathVariable String branchName) {
+
+		List<InventoryLogDTO> logs = inventoryLogService.getStockHistoryByProductAndBranch(productCode, branchName);
+		return ResponseEntity.ok(logs);
+	}
+
+	//전국 재고량
+	@GetMapping("/log/avg/{productCode}")
+	public ResponseEntity<List<InventoryLogDTO>> getAverageStockHistory(
+		@PathVariable String productCode) {
+
+		List<InventoryLogDTO> logs = inventoryLogService.getAverageStockHistoryByProduct(productCode);
+		return ResponseEntity.ok(logs);
+	}
+
+	// 마이그레이션 용 , 신경 쓸 필요 없습니다 궁금하면 정승호에게 물어봐주세요
+	@GetMapping("/migrate-log-remaining")
+	public ResponseEntity<String> migrateRemainingStock() {
+		inventoryLogService.migrateRemainingStock();
+		return ResponseEntity.ok("로그 마이그레이션 완료");
+
 	}
 
 }

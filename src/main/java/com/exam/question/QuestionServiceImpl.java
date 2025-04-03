@@ -1,11 +1,14 @@
 package com.exam.question;
 
-import com.exam.answer.AnswerRepository;  // AnswerRepository 임포트
-import com.exam.answer.Answer;  // Answer 임포트
-import org.springframework.stereotype.Service;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import com.exam.answer.Answer;
+import com.exam.answer.AnswerRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
@@ -26,7 +29,7 @@ public class QuestionServiceImpl implements QuestionService {
 			.userId(userId)
 			.title(questionDTO.getTitle())
 			.content(questionDTO.getContent())
-			.status(Question.QuestionStatus.PENDING)
+			.status(Question.QuestionStatus.WAITING)
 			.build();
 
 		questionRepository.save(question);

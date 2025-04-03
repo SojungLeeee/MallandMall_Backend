@@ -28,5 +28,7 @@ public interface BranchService {
 	// navermap - 가까운 지점 찾기
 	BranchDTO findNearestBranch(Double latitude, Double longitude);
 
+	// 가까운 지점을 재고로 찾기
+	List<BranchWithStockDTO> findNearestBranchesWithStock(double latitude, double longitude, List<String> productCodes, int limit);
 	}
 

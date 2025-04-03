@@ -203,6 +203,77 @@ public class BranchServiceImpl implements BranchService {
 		return R * c;
 	}
 
+	// 가까운 지점 재고 조회 로직
+	@Override
+	public List<BranchWithStockDTO> findNearestBranchesWithStock(double userLatitude, double userLongitude,
+		List<String> productCodes, int limit) {
+		// 모든 지점 정보 가져오기
+		List<Branch> allBranches = branchRepository.findAll();
+
+		// 지점별 거리 계산 및 정렬
+		List<Branch> sortedBranches = allBranches.stream()
+			.filter(branch -> branch.getLatitude() != null && branch.getLongitude() != null)
+			.sorted((b1, b2) -> {
+				double distance1 = calculateDistance(userLatitude, userLongitude,
+					b1.getLatitude(), b1.getLongitude());
+				double distance2 = calculateDistance(userLatitude, userLongitude,
+					b2.getLatitude(), b2.getLongitude());
+				return Double.compare(distance1, distance2);
+			})
+			.collect(Collectors.toList());
+
+		// 결과 리스트 준비
+		List<BranchWithStockDTO> result = new ArrayList<>();
+
+		// 가까운 지점부터 재고 확인
+		for (Branch branch : sortedBranches) {
+			if (result.size() >= limit) {
+				break; // 요청된 개수만큼 결과를 얻었으면 중단
+			}
+
+			double distance = calculateDistance(userLatitude, userLongitude,
+				branch.getLatitude(), branch.getLongitude());
+
+			// 해당 지점의 상품별 재고 확인
+			Map<String, Integer> stockInfo = new HashMap<>();
+			boolean hasAllStock = true;
+
+			for (String productCode : productCodes) {
+				// 인벤토리 서비스를 통해 재고 확인
+				// 실제 구현에 맞게 수정 필요 - 현재는 가정: inventoryService가 지점별 상품 수량을 반환
+				// 지점의 특정 상품 수량 조회 메소드 필요
+				// 예: Integer quantity = inventoryService.getQuantityByProductAndBranch(productCode, branch.getBranchName());
+
+				// 지점의 모든 인벤토리 조회 메소드 필요
+				// 제공된 코드는 상품 코드별 지점 수량을 반환하는 메소드가 있지만, 반대 방향 조회 메소드 필요
+				Map<String, Integer> productQuantities = inventoryService.findQuantityByProductCode(productCode);
+
+				int quantity = productQuantities.getOrDefault(branch.getBranchName(), 0);
+				stockInfo.put(productCode, quantity);
+
+				// 하나라도 재고가 없으면 전체 재고 없음으로 표시
+				if (quantity <= 0) {
+					hasAllStock = false;
+				}
+			}
+
+			// DTO 생성하여 결과에 추가
+			BranchWithStockDTO branchDTO = BranchWithStockDTO.builder()
+				.branchName(branch.getBranchName())
+				.branchAddress(branch.getBranchAddress())
+				.latitude(branch.getLatitude())
+				.longitude(branch.getLongitude())
+				.distance(distance)
+				.hasStock(hasAllStock)
+				.stockDetails(stockInfo)
+				.build();
+
+			result.add(branchDTO);
+		}
+
+		return result;
+	}
+
 	//커스텀 예외(지점 수정에서 사용 중)
 	public class BranchNotFoundException extends RuntimeException {
 		public BranchNotFoundException(String message) {

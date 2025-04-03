@@ -152,15 +152,32 @@ public class BranchController {
 		}
 	}
 
+	@PostMapping("/nearestWithStock")
+	public ResponseEntity<?> findNearestBranchWithStock(@RequestBody NearestWithStockRequestDTO requestDTO) {
+		try {
+			// 요청에서 필요한 데이터 추출
+			double latitude = requestDTO.getLatitude();
+			double longitude = requestDTO.getLongitude();
+			List<String> productCodes = requestDTO.getProductCodes();
+			int limit = requestDTO.getLimit() != null ? requestDTO.getLimit() : 5; // 기본값 5개 지점 반환
 
+			// 가까운 지점 찾기 + 재고 정보 확인 서비스 호출
+			List<BranchWithStockDTO> nearestBranchesWithStock = branchService.findNearestBranchesWithStock(
+				latitude, longitude, productCodes, limit
+			);
 
-
-
-
-	//커스텀 예외(지점 수정에서 사용 중)
-	public class BranchNotFoundException extends RuntimeException {
-		public BranchNotFoundException(String message) {
-			super(message);
+			return ResponseEntity.ok(nearestBranchesWithStock);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.body("재고가 있는 가장 가까운 지점을 찾는 중 오류가 발생했습니다: " + e.getMessage());
 		}
 	}
-}
+
+		//커스텀 예외(지점 수정에서 사용 중)
+		public class BranchNotFoundException extends RuntimeException {
+			public BranchNotFoundException(String message) {
+				super(message);
+			}
+		}
+	}
+

@@ -1,5 +1,6 @@
 package com.exam.admin;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -8,7 +9,10 @@ import org.springframework.stereotype.Service;
 
 import com.exam.adminbranch.Branch;
 import com.exam.adminbranch.BranchRepository;
+import com.exam.inventory.ChangeType;
 import com.exam.inventory.Inventory;
+import com.exam.inventory.InventoryLog;
+import com.exam.inventory.InventoryLogRepository;
 import com.exam.inventory.InventoryRepository;
 import com.exam.product.Product;
 import com.exam.product.ProductDTO;
@@ -24,17 +28,20 @@ public class AdminServiceImpl implements AdminService {
 	InventoryRepository inventoryRepository;
 	BranchRepository branchRepository;
 	ProductRepository productRepository;
+	InventoryLogRepository inventoryLogRepository;
 
 	public AdminServiceImpl(AdminRepositoryGoods adminRepositoryGoods,
 		AdminRepositoryProducts adminRepositoryProducts,
 		InventoryRepository inventoryRepository,
 		BranchRepository branchRepository,
-		ProductRepository productRepository) {
+		ProductRepository productRepository,
+		InventoryLogRepository inventoryLogRepository) {
 		this.adminRepositoryGoods = adminRepositoryGoods;
 		this.adminRepositoryProducts = adminRepositoryProducts;
 		this.inventoryRepository = inventoryRepository;
 		this.branchRepository = branchRepository;
 		this.productRepository = productRepository;
+		this.inventoryLogRepository = inventoryLogRepository;
 	}
 
 	@Override
@@ -68,12 +75,34 @@ public class AdminServiceImpl implements AdminService {
 				.branchName(goodsDTO.getBranchName())
 				.quantity(goodsDTO.getQuantity())  // 입고 개수만큼 초기화
 				.build();
-			inventoryRepository.save(newInventory);  // 새로 생성된 재고 정보 저장
+			inventoryRepository.save(newInventory);
+
+			// 새로 생성된 재고 정보 저장
 		} else {
 			// 5. 해당하는 Inventory 레코드가 있다면 수량을 입고 개수만큼 증가
 			inventory.setQuantity(inventory.getQuantity() + goodsDTO.getQuantity());  // 입고 개수만큼 수량 증가
 			inventoryRepository.save(inventory);  // 갱신된 정보 저장
 		}
+		// 현재까지의 누적 재고량 계산
+		List<InventoryLog> logs = inventoryLogRepository
+			.findByProductCodeAndBranchNameOrderByChangeDateAsc(
+				goodsDTO.getProductCode(), goodsDTO.getBranchName());
+
+		int currentStock = 0;
+		for (InventoryLog log : logs) {
+			currentStock += (log.getChangeType() == ChangeType.IN) ? log.getQuantity() : -log.getQuantity();
+		}
+
+		int updatedStock = currentStock + goodsDTO.getQuantity(); // 입고이므로 더하기
+		// 상품 입고 되는거 로그테이블에 저장
+		inventoryLogRepository.save(
+			InventoryLog.builder()
+				.productCode(goodsDTO.getProductCode())
+				.branchName(goodsDTO.getBranchName())
+				.changeType(ChangeType.IN)
+				.quantity(goodsDTO.getQuantity())
+				.changeDate(LocalDateTime.now())
+				.build());
 	}
 
 	@Override
@@ -83,22 +112,46 @@ public class AdminServiceImpl implements AdminService {
 
 		if (goods != null) {
 			adminRepositoryGoods.delete(goods);
-			// adminRepositoryProducts.deleteById(product.getId());
 		}
 
-		// 2. Inventory 테이블에서 해당 productCode와 branchName을 가진 레코드 확인
+		// Inventory 재고 조정
 		Inventory inventory = inventoryRepository.findByProductCodeAndBranchName(
 			goods.getProductCode(), goods.getBranchName());
 
-		// 2-1. Inventory의 quantity가 1 이상이면 1 감소
 		if (inventory.getQuantity() > 1) {
-			inventory.setQuantity(inventory.getQuantity() - 1); // quantity 1 감소
-			inventoryRepository.save(inventory);  // 갱신된 정보 저장
+			inventory.setQuantity(inventory.getQuantity() - 1);
+			inventoryRepository.save(inventory);
 		} else {
-			// 2-2. Inventory의 quantity가 1이면 해당 레코드 삭제
-			inventoryRepository.delete(inventory);  // 해당 레코드 삭제
+			inventoryRepository.delete(inventory);
 		}
+
+		//  현재까지 누적 재고량 계산
+		List<InventoryLog> logs = inventoryLogRepository
+			.findByProductCodeAndBranchNameOrderByChangeDateAsc(
+				goods.getProductCode(), goods.getBranchName());
+
+		int currentStock = 0;
+		for (InventoryLog log : logs) {
+			currentStock += (log.getChangeType() == ChangeType.IN)
+				? log.getQuantity()
+				: -log.getQuantity();
+		}
+
+		int updatedStock = currentStock - 1;
+
+		// 로그 저장
+		inventoryLogRepository.save(
+			InventoryLog.builder()
+				.productCode(goods.getProductCode())
+				.branchName(goods.getBranchName())
+				.changeType(ChangeType.OUT)
+				.quantity(1)
+				.remainingStock(updatedStock)
+				.changeDate(LocalDateTime.now())
+				.build()
+		);
 	}
+
 
 	@Override
 	@Transactional

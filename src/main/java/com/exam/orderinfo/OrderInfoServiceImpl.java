@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import com.exam.order.OrderInfo;
+import com.exam.inventory.InventoryService;
+import com.exam.orderinfo.OrderInfo;
 import com.exam.product.Product;
 import com.exam.product.ProductRepository;
 import com.siot.IamportRestClient.IamportClient;
@@ -15,6 +17,7 @@ import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,41 +29,60 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 	private final IamportClient iamportClient;
 	private final OrderInfoRepository orderInfoRepository;
 	private final ProductRepository productRepository;
+	private final InventoryService inventoryService;
+	private OrderInfoDTO dto;
 
+	// verifyAndSaveOrder 메소드에 재고 차감 로직 추가
 	@Override
+	@Transactional
 	public boolean verifyAndSaveOrder(OrderInfoDTO dto) {
 		try {
-			// imp_uid를 사용해 아임포트에서 결제 정보 가져오기
+			// 기존 결제 검증 코드 유지
 			IamportResponse<Payment> response = iamportClient.paymentByImpUid(dto.getImpUid());
 
 			if (response == null || response.getResponse() == null) {
-				log.warn(" 결제 정보를 불러올 수 없습니다.");
+				log.warn("결제 정보를 불러올 수 없습니다.");
 				return false;
 			}
 
 			int paidAmount = response.getResponse().getAmount().intValue();
+			String branchName = dto.getBranchName(); // 새로 추가된 필드
+
+			// 지점명이 없으면 처리 불가
+			if (branchName == null || branchName.isEmpty()) {
+				log.warn("주문을 처리할 지점 정보가 없습니다.");
+				return false;
+			}
 
 			if (dto.getOrders() != null && !dto.getOrders().isEmpty()) {
-				// 개별 상품에 대한 주문 저장
+				// 여러 상품 주문 처리
 				for (ProductOrderDTO item : dto.getOrders()) {
-					Product product = productRepository.findByProductCode(item.getProductCode());
-					if (product == null) {
-						log.warn(" 상품을 찾을 수 없습니다22: {}", item.getProductCode());
+					// 재고 차감 시도
+					boolean inventoryUpdated = inventoryService.updateInventory(
+						branchName,
+						item.getProductCode(),
+						-item.getQuantity() // 음수로 전달하여 재고 차감
+					);
+
+					// 재고 부족 시 롤백
+					if (!inventoryUpdated) {
+						TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+						log.warn("재고 부족으로 주문을 처리할 수 없습니다: {}", item.getProductCode());
 						return false;
 					}
 
-					// 실제 결제된 금액을 기준으로 처리
-					//int itemPrice = paidAmount / dto.getOrders().size(); // 예시: 결제된 금액을 주문 개수로 나누어 분배
-					//int itemPrice = product.getPrice() * item.getQuantity();
-					// 할인된 가격을 사용
-					int originalPrice = product.getPrice() * item.getQuantity(); // 원래 가격 계산
-					int discountPercent = dto.getDiscountedPrice(); // 할인 비율
+					// 이하 기존 주문 처리 코드
+					Product product = productRepository.findByProductCode(item.getProductCode());
+					if (product == null) {
+						TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+						log.warn("상품을 찾을 수 없습니다: {}", item.getProductCode());
+						return false;
+					}
 
-					// 할인된 가격 계산 후 바로 int 형으로 변환 (소수점 버림)
+					int originalPrice = product.getPrice() * item.getQuantity();
+					int discountPercent = dto.getDiscountedPrice();
 					int itemPrice = (int)(originalPrice - (originalPrice * (discountPercent / 100.0)));
-					System.out.println("할인비율 : " + dto.getDiscountedPrice());
-					System.out.println("할인된 가격 : " + itemPrice);
-					// 개별 주문 저장
+
 					OrderInfo order = OrderInfo.builder()
 						.userId(dto.getUserId())
 						.productCode(item.getProductCode())
@@ -70,44 +92,59 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 						.addr1(dto.getAddr1())
 						.addr2(dto.getAddr2())
 						.phoneNumber(dto.getPhoneNumber())
-						.orderPrice(itemPrice)  // 실제 결제 금액으로 저장
+						.orderPrice(itemPrice)
 						.impUid(dto.getImpUid())
 						.orderDate(dto.getOrderDate())
+						.branchName(branchName) // 주문 처리 지점 정보 저장
 						.build();
 
 					orderInfoRepository.save(order);
 				}
 
 				return true;
+			} else {
+				// 단일 상품 주문 처리
+
+				// 재고 차감 시도
+				boolean inventoryUpdated = inventoryService.updateInventory(
+					branchName,
+					dto.getProductCode(),
+					-dto.getQuantity() // 음수로 전달하여 재고 차감
+				);
+
+				// 재고 부족 시 롤백
+				if (!inventoryUpdated) {
+					log.warn("재고 부족으로 주문을 처리할 수 없습니다: {}", dto.getProductCode());
+					return false;
+				}
+
+				// 이하 기존 주문 처리 코드
+				Product product = productRepository.findByProductCode(dto.getProductCode());
+				if (product == null) {
+					log.warn("상품을 찾을 수 없습니다.");
+					return false;
+				}
+
+				int orderPrice = paidAmount;
+
+				OrderInfo order = OrderInfo.builder()
+					.userId(dto.getUserId())
+					.productCode(dto.getProductCode())
+					.quantity(dto.getQuantity())
+					.receiverName(dto.getReceiverName())
+					.post(dto.getPost())
+					.addr1(dto.getAddr1())
+					.addr2(dto.getAddr2())
+					.phoneNumber(dto.getPhoneNumber())
+					.orderPrice(orderPrice)
+					.impUid(dto.getImpUid())
+					.orderDate(dto.getOrderDate())
+					.branchName(branchName) // 주문 처리 지점 정보 저장
+					.build();
+
+				orderInfoRepository.save(order);
+				return true;
 			}
-
-			Product product = productRepository.findByProductCode(dto.getProductCode());
-			System.out.println("선택된 product : " + product);
-			if (product == null) {
-				log.warn(" 상품을 찾을 수 없습니다111.");
-				return false;
-			}
-
-			// 실제 결제된 금액을 사용
-			int orderPrice = paidAmount;
-
-			// 주문 저장
-			OrderInfo order = OrderInfo.builder()
-				.userId(dto.getUserId())
-				.productCode(dto.getProductCode())
-				.quantity(dto.getQuantity())
-				.receiverName(dto.getReceiverName())
-				.post(dto.getPost())
-				.addr1(dto.getAddr1())
-				.addr2(dto.getAddr2())
-				.phoneNumber(dto.getPhoneNumber())
-				.orderPrice(orderPrice)  // 실제 결제 금액으로 저장
-				.impUid(dto.getImpUid())
-				.orderDate(dto.getOrderDate())
-				.build();
-
-			orderInfoRepository.save(order);
-			return true;
 
 		} catch (IamportResponseException | IOException e) {
 			e.printStackTrace();
@@ -178,4 +215,5 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 			.orderDate(order.getOrderDate())
 			.build();
 	}
+
 }

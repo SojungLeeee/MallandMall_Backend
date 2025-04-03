@@ -26,5 +26,9 @@ public class BranchDTO {
 
 	//재고 있는 상품 수
 	Integer goodsCount;
+
+	//거리 정보 추가
+	Double distance;
+
 }
 

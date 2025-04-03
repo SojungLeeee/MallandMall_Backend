@@ -1,4 +1,4 @@
-package com.exam.order;
+package com.exam.orderinfo;
 
 import java.time.LocalDate;
 
@@ -45,4 +45,7 @@ public class OrderInfo {
 	private int orderPrice;
 
 	LocalDate orderDate = LocalDate.now();
+
+	// 주문을 처리한 매장 정보
+	private String branchName;
 }

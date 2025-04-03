@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class InventoryServiceImpl implements InventoryService {
 
@@ -77,6 +79,31 @@ public class InventoryServiceImpl implements InventoryService {
 		return branchQuantities;
 	}
 
+	@Override
+	@Transactional
+	public boolean updateInventory(String branchName, String productCode, int quantityChange) {
+		try {
+			Inventory inventory = inventoryRepository.findByProductCodeAndBranchName(productCode, branchName);
 
+			if (inventory == null) {
+				return false;
+			}
+
+			int currentQuantity = inventory.getQuantity();
+			int newQuantity = currentQuantity + quantityChange;
+
+			// 재고가 0 미만이 되지 않도록 체크
+			if (newQuantity < 0) {
+				return false;
+			}
+
+			inventory.setQuantity(newQuantity);
+			inventoryRepository.save(inventory);
+
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 
 }

@@ -38,4 +38,7 @@ public class OrderInfoDTO {
 
 	String selectedCoupon; // 추가된 부분 (쿠폰 정보)
 	LocalDate orderDate = LocalDate.now();
+
+	// 주문을 처리한 매장 정보
+	private String branchName;
 }

@@ -8,9 +8,9 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.exam.order.OrderInfo;
+import com.exam.orderinfo.OrderInfo;
 
-public interface OrderInfoRepository extends JpaRepository<com.exam.order.OrderInfo, Long> {
+public interface OrderInfoRepository extends JpaRepository<OrderInfo, Long> {
 	// 댓글쓸떄 구매내역 조회
 	boolean existsByUserIdAndProductCode(String userId, String productCode);
 

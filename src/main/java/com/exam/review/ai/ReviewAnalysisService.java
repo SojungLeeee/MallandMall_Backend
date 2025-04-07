@@ -1,25 +1,29 @@
 package com.exam.review.ai;
 
-import com.exam.product.Product;
-import com.exam.product.ProductRepository;
-import com.exam.review.Review;
-import com.exam.review.ReviewRepository;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.ai.chat.ChatClient;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import com.exam.product.Product;
+import com.exam.product.ProductRepository;
+import com.exam.review.Review;
+import com.exam.review.ReviewRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
@@ -28,9 +32,10 @@ public class ReviewAnalysisService {
 
 	private final ReviewRepository reviewRepository;
 	private final ProductRepository productRepository;
-	private final ChatClient chatClient;
+	private final ChatClient chatClient; //AI 모델과의 대화를 처리하는 핵심 인터페이스
+	//ChatClient : 프롬프트를 보내고 응답을 받는 역할, LLM 과의 상호작용 담당
 
-	@Cacheable(value = "reviewAnalysis", key = "#productCode")
+	//@Cacheable(value = "reviewAnalysis", key = "#productCode")
 	public ReviewAnalysisResponseDTO analyzeReviews(String productCode) {
 		log.info("Analyzing reviews for product code: {}", productCode);
 
@@ -56,10 +61,10 @@ public class ReviewAnalysisService {
 			.map(r -> "별점: " + r.getRating() + "/5, 리뷰: " + r.getReviewText())
 			.collect(Collectors.joining("\n"));
 
-		// AI 모델에 분석 요청
+		// AI 모델에 리뷰 분석 요청
 		String aiResponse = requestAiAnalysis(product.getProductName(), reviewTexts);
 
-		// JSON 응답 파싱
+		// AI 응답을 JSON (DTO) 형태로 파싱
 		ReviewAnalysisResponseDTO response = parseAiResponse(aiResponse);
 		response.setProductCode(productCode);
 		response.setProductName(product.getProductName());
@@ -87,6 +92,7 @@ public class ReviewAnalysisService {
 		log.info("Requesting AI analysis for product: {}", productName);
 
 		// 시스템 메시지 생성
+		// AI의 역할/행동 지침을 사전에 설정하는 프롬프트 객체
 		SystemMessage systemMessage = new SystemMessage(
 			"당신은 제품 리뷰 분석 전문가입니다. 사용자가 제공하는 제품 리뷰들을 분석하여 다음 정보를 JSON 형식으로 반환하세요:\n" +
 				"1. sentimentAnalysis: 긍정/부정/중립 감정 비율 (예: {\"positive\": 0.7, \"negative\": 0.2, \"neutral\": 0.1})\n" +
@@ -98,12 +104,18 @@ public class ReviewAnalysisService {
 		);
 
 		// 사용자 메시지 생성
+		// 사용자의 실제 요청을 보내는 객체
 		UserMessage userMessage = new UserMessage(
 			"다음은 '" + productName + "' 제품에 대한 사용자 리뷰입니다. 분석해주세요:\n\n" + reviewTexts
 		);
 
 		// 프롬프트 생성
 		List<Message> messages = Arrays.asList(systemMessage, userMessage);
+
+		// SystemMessage + UserMessage를 묶은 프롬프트
+		// ChatClient가 처리할 수 있도록 포맷을 갖춘 것
+		// AI에게 프롬프트를 전달하고 응답을 받아 결과를 JSON 으로 반환함
+		// 내부적으로 Spring AI 가 사용하는 LLM에 요청이 전송됨
 		Prompt prompt = new Prompt(messages);
 
 		try {

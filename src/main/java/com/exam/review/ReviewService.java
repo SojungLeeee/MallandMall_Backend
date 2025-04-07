@@ -19,6 +19,7 @@ public interface ReviewService {
 	//  특정 상품의 평균 별점 조회
 	double getAverageRating(String productCode);
 
-
 	List<ReviewDTO> getReviewsByUser(String userId);
+
+	List<ReviewDTO> findByProductCodeAndRating(String productCode, int rating);
 }

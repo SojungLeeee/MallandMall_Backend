@@ -1,11 +1,14 @@
 package com.exam.review;
 
-import com.exam.orderinfo.OrderInfoRepository;
-import org.springframework.stereotype.Service;
-import jakarta.transaction.Transactional;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import com.exam.orderinfo.OrderInfoRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
@@ -17,8 +20,6 @@ public class ReviewServiceImpl implements ReviewService {
 		this.reviewRepository = reviewRepository;
 		this.orderInfoRepository = orderInfoRepository;
 	}
-
-
 
 	// 리뷰 작성 (구매한 사용자만 가능)
 	@Override
@@ -87,6 +88,15 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	public double getAverageRating(String productCode) {
 		return reviewRepository.getAverageRating(productCode);
+	}
+
+	// 특정 상품의 별점 별 리뷰 조회
+	@Override
+	public List<ReviewDTO> findByProductCodeAndRating(String productCode, int rating) {
+		List<Review> reviews = reviewRepository.findByProductCodeAndRating(productCode, rating);
+		return reviews.stream()
+			.map(this::convertToDTO)
+			.collect(Collectors.toList());
 	}
 
 	//  Entity → DTO 변환 메서드

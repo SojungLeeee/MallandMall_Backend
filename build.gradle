@@ -60,7 +60,8 @@ dependencies {
 
     // AI 관련
     implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter:0.8.0'
-    implementation 'org.springframework.ai:spring-ai-core'
+    implementation 'org.springframework.ai:spring-ai-core:0.8.0'
+
 
     // 결제 연동
     implementation 'com.github.iamport:iamport-rest-client-java:0.2.21'

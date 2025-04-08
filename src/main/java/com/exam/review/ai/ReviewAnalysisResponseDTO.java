@@ -22,4 +22,5 @@ public class ReviewAnalysisResponseDTO {
 	private List<String> keyNegativePoints;
 	private String summary;
 	private List<String> recommendations;
+
 }

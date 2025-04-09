@@ -27,6 +27,7 @@ public class InventoryAnomalyNotificationService {
 		try {
 			//  AI 분석 수행
 			InventoryAlertDTO result = aiService.analyzeBranchInventoryTrend(productCode, branchName);
+			log.info("🔥 비동기 실행 - 상품: {}, 지점: {}, 쓰레드: {}", productCode, branchName, Thread.currentThread().getName());
 
 			// 조건 만족 시 알림 저장
 			if (result.isAnomaly() && result.getRiskScore() >= 80) {

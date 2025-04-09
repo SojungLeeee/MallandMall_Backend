@@ -26,5 +26,6 @@ public class AlertLog {
 	private String trendSummary; // 재고 흐름 요약
 	private String recommendation; // 관리자에게 추천하는 행위
 	private int riskScore; // 위험 점수
+	private boolean alertRead = false;
 	private LocalDateTime alertTime;
 }

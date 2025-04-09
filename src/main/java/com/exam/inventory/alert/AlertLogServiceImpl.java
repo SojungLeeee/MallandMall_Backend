@@ -37,4 +37,13 @@ public class AlertLogServiceImpl implements AlertLogService {
 	public List<AlertLog> getAlertsByProduct(String productCode) {
 		return alertLogRepository.findByProductCodeOrderByAlertTimeDesc(productCode);
 	}
+
+	@Override
+	public void markAlertAsRead(Long alertId) {
+		AlertLog alert = alertLogRepository.findById(alertId)
+			.orElseThrow(() -> new RuntimeException("해당 알림을 찾을 수 없습니다."));
+
+		alert.setAlertRead(true);
+		alertLogRepository.save(alert);
+	}
 }

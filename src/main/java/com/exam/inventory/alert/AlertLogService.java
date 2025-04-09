@@ -11,4 +11,7 @@ public interface AlertLogService {
 	List<AlertLog> getAllAlerts();
 
 	List<AlertLog> getAlertsByProduct(String productCode);
+
+	void markAlertAsRead(Long alertId);
+
 }

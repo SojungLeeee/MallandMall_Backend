@@ -24,5 +24,12 @@ public class AlertLogController {
 	public ResponseEntity<List<AlertLog>> getAlertsByProduct(@PathVariable String productCode) {
 		return ResponseEntity.ok(alertLogService.getAlertsByProduct(productCode));
 	}
+
+	// 알림 읽음 처리 용도
+	@PutMapping("/read/{alertId}")
+	public ResponseEntity<Void> markAlertAsRead(@PathVariable Long alertId) {
+		alertLogService.markAlertAsRead(alertId);
+		return ResponseEntity.ok().build();
+	}
 }
 

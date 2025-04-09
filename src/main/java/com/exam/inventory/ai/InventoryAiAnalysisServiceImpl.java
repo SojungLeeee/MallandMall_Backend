@@ -107,7 +107,15 @@ public class InventoryAiAnalysisServiceImpl implements InventoryAiAnalysisServic
 	}
 
 	private InventoryAlertDTO parseAiResponse(String jsonResponse) {
+
 		try {
+			// 어쩌다 한번씩 유효하지 않은 json 응답이 올때가 있음 그거 대비 로그임 예를 들어 { 로 시작하지 않는다던가
+			if (jsonResponse == null || !jsonResponse.trim().startsWith("{")) {
+				log.error("AI 응답이 유효한 JSON이 아닙니다: {}", jsonResponse);
+				throw new RuntimeException("AI 응답 포맷 오류");
+			}
+			log.error("📥 AI 원본 응답:\n{}", jsonResponse);
+
 			JSONObject json = new JSONObject(jsonResponse);
 			return new InventoryAlertDTO(
 				json.optBoolean("anomaly", false),

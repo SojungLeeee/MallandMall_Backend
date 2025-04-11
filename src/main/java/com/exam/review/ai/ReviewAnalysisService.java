@@ -113,7 +113,7 @@ public class ReviewAnalysisService {
 		// 시스템 메시지 생성
 		// AI의 역할/행동 지침을 사전에 설정하는 프롬프트 객체
 		SystemMessage systemMessage = new SystemMessage(
-			"당신은 제품 리뷰 분석 전문가입니다. 사용자가 제공하는 제품 리뷰들을 분석하여 다음 정보를 JSON 형식으로 반환하세요:\n" +
+			"당신은 제품 리뷰 분석 전문가입니다. 사용자가 제공하는 제품 리뷰들을 분석하여 다음 정보를 JSON 형식으로 반환해야하고, ```json 등의 마크다운 코드는 포함하지 마세요:\n" +
 				"1. sentimentAnalysis: 긍정/부정/중립 감정 비율 (예: {\"positive\": 0.7, \"negative\": 0.2, \"neutral\": 0.1})\n" +
 				"2. keyPositivePoints: 주요 긍정적 포인트 리스트 (최대 5개)\n" +
 				"3. keyNegativePoints: 주요 부정적 포인트 리스트 (최대 5개)\n" +
@@ -154,6 +154,7 @@ public class ReviewAnalysisService {
 
 	private ReviewAnalysisResponseDTO parseAiResponse(String jsonResponse) {
 		try {
+			log.info("AI 응답 원문: {}", jsonResponse);
 			log.info("Parsing AI response");
 			ReviewAnalysisResponseDTO dto = new ReviewAnalysisResponseDTO();
 			JSONObject json = new JSONObject(jsonResponse);

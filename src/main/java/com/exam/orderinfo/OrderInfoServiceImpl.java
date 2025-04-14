@@ -2,12 +2,17 @@ package com.exam.orderinfo;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import com.exam.inventory.ChangeType;
+import com.exam.inventory.Inventory;
+import com.exam.inventory.InventoryLog;
+import com.exam.inventory.InventoryLogRepository;
 import com.exam.inventory.InventoryService;
 import com.exam.orderinfo.OrderInfo;
 import com.exam.product.Product;
@@ -31,6 +36,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 	private final ProductRepository productRepository;
 	private final InventoryService inventoryService;
 	private OrderInfoDTO dto;
+	private final InventoryLogRepository inventoryLogRepository;
 
 	// verifyAndSaveOrder 메소드에 재고 차감 로직 추가
 	@Override
@@ -70,6 +76,28 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 						log.warn("재고 부족으로 주문을 처리할 수 없습니다: {}", item.getProductCode());
 						return false;
 					}
+					List<InventoryLog> logs = inventoryLogRepository
+						.findByProductCodeAndBranchNameOrderByChangeDateAsc(item.getProductCode(), branchName);
+
+					int currentStock = 0;
+					for (InventoryLog log : logs) {
+						currentStock += (log.getChangeType() == ChangeType.IN)
+							? log.getQuantity()
+							: -log.getQuantity();
+					}
+
+					int updatedStock = currentStock - item.getQuantity();
+
+					inventoryLogRepository.save(
+						InventoryLog.builder()
+							.productCode(item.getProductCode())
+							.branchName(branchName)
+							.changeType(ChangeType.OUT)
+							.quantity(item.getQuantity())
+							.remainingStock(updatedStock)
+							.changeDate(LocalDateTime.now())
+							.build()
+					);
 
 					// 이하 기존 주문 처리 코드
 					Product product = productRepository.findByProductCode(item.getProductCode());
@@ -117,6 +145,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 					log.warn("재고 부족으로 주문을 처리할 수 없습니다: {}", dto.getProductCode());
 					return false;
 				}
+				
 
 				// 이하 기존 주문 처리 코드
 				Product product = productRepository.findByProductCode(dto.getProductCode());
@@ -124,6 +153,29 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 					log.warn("상품을 찾을 수 없습니다.");
 					return false;
 				}
+
+				List<InventoryLog> logs = inventoryLogRepository
+					.findByProductCodeAndBranchNameOrderByChangeDateAsc(dto.getProductCode(), branchName);
+
+				int currentStock = 0;
+				for (InventoryLog log : logs) {
+					currentStock += (log.getChangeType() == ChangeType.IN)
+						? log.getQuantity()
+						: -log.getQuantity();
+				}
+				// 로그 테이블에 로그 남기기
+				int updatedStock = currentStock - dto.getQuantity();
+
+				inventoryLogRepository.save(
+					InventoryLog.builder()
+						.productCode(dto.getProductCode())
+						.branchName(branchName)
+						.changeType(ChangeType.OUT)
+						.quantity(dto.getQuantity())
+						.remainingStock(updatedStock)
+						.changeDate(LocalDateTime.now())
+						.build()
+				);
 
 				int orderPrice = paidAmount;
 

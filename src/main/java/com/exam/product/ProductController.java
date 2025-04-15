@@ -1,6 +1,9 @@
 package com.exam.product;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -61,6 +64,33 @@ public class ProductController {
 
 		List<ProductDTO> productDTOs = productService.getProductsByUserId(userId);
 		return ResponseEntity.ok(productDTOs);
+	}
+
+	// 다중 상품 코드로 상품 정보 조회 API 추가
+	@GetMapping("/multiple")
+	public ResponseEntity<List<ProductDTO>> getMultipleProducts(
+		@RequestParam("productCodes") String productCodesStr) {
+
+		// 콤마로 구분된 상품 코드 문자열을 리스트로 변환
+		List<String> productCodes = Arrays.asList(productCodesStr.split(","))
+			.stream()
+			.map(String::trim)
+			.filter(code -> !code.isEmpty())
+			.collect(Collectors.toList());
+
+		// 상품 코드 목록이 비어있으면 빈 목록 반환
+		if (productCodes.isEmpty()) {
+			return ResponseEntity.ok(Collections.emptyList());
+		}
+
+		// 서비스를 통해 여러 상품 정보 조회
+		List<ProductDTO> products = productService.getProductsByProductCodes(productCodes);
+
+		if (products.isEmpty()) {
+			return ResponseEntity.noContent().build();
+		}
+
+		return ResponseEntity.ok(products);
 	}
 
 	@GetMapping("/search")

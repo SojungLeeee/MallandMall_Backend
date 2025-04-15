@@ -100,7 +100,7 @@ public class ChatbotService {
 			float[] queryEmbedding = reviewAnalysisVectorService.createEmbedding(userQuery);
 			String vectorStr = reviewAnalysisVectorService.formatVector(queryEmbedding);
 
-			// 기존 리포지토리의 메서드를 활용한 검색
+			// 리포지토리의 메서드를 활용한 검색
 			List<Object[]> results = vectorRepository.findSimilarByEmbedding(vectorStr, 3);
 
 			if (results == null || results.isEmpty()) {
@@ -116,18 +116,18 @@ public class ChatbotService {
 			for (Object[] result : results) {
 				Integer analysisId = (Integer) result[0];
 				String productCode = (String) result[1];
-				Double similarity = (Double) result[2];
+				String productName = (String) result[2];  // 새로 추가된 product_name 필드
+				Double similarity = (Double) result[3];   // similarity는 인덱스 3에 있음
 
 				ProductDTO product = productService.getProductByCode(productCode);
 				if (product != null) {
-					contextBuilder.append("제품명: ").append(product.getProductName())
+					contextBuilder.append("제품명: ").append(productName != null ? productName : product.getProductName())
 						.append("\n제품코드: ").append(productCode)
 						.append("\n카테고리: ").append(product.getCategory())
 						.append("\n가격: ").append(product.getPrice()).append("원")
 						.append("\n평균 평점: ").append(product.getAverageRating());
 
 					// 분석 ID로 추가 정보 가져오기 (요약, 긍정/부정 포인트)
-					// 이 부분은 필요에 따라 ReviewAnalysisDAO나 다른 리포지토리에서 가져와야 함
 					ReviewAnalysisVector vector = vectorRepository.findById(analysisId).orElse(null);
 					if (vector != null) {
 						// 요약과 포인트는 다른 테이블에서 가져와야 할 수 있음
@@ -143,10 +143,17 @@ public class ChatbotService {
 			return contextBuilder.toString();
 		} catch (Exception e) {
 			log.error("Error during vector search: {}", e.getMessage(), e);
+			// 에러 스택 트레이스도 로깅
+			log.debug("Stack trace:", e);
+
+			// 벡터 검색 실패 시 키워드 기반 검색으로 폴백
+			List<String> keywords = extractKeywords(userQuery);
+			if (!keywords.isEmpty()) {
+				return getProductInfoByKeywords(keywords);
+			}
 			return "";
 		}
 	}
-
 	private List<String> extractKeywords(String userQuery) {
 		// 간단한 키워드 추출 로직 (실제로는 좀 더 정교한 로직을 구현하는 것이 좋음)
 		List<String> stopWords = Arrays.asList("은", "는", "이", "가", "을", "를", "에", "의", "로", "으로", "에서", "세요", "해주세요", "해줘", "알려줘", "찾아줘", "추천해줘");

@@ -18,7 +18,7 @@ public interface AdminService {
 
 	void addGoods(GoodsDTO goodsDTO);
 
-	void deleteGoods(int goodsId);
+	void deleteGoods(List<Integer> goodsIds);
 
 	void updateGoods(int goodsId, GoodsDTO goodsDTO);
 

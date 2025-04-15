@@ -85,10 +85,16 @@ public class AdminController {
 		return ResponseEntity.created(null).body(goodsDTO);  // 201 상태코드 반환됨.
 	}
 
-	@DeleteMapping("/deleteGoods/{goodsId}")
-	public ResponseEntity<GoodsDTO> deleteGoods(@PathVariable Integer goodsId) {
-		adminService.deleteGoods(goodsId);
-		return ResponseEntity.ok().build();  // 상태 코드 200 OK
+	// @DeleteMapping("/deleteGoods/{goodsId}")
+	// public ResponseEntity<GoodsDTO> deleteGoods(@PathVariable Integer goodsId) {
+	// 	adminService.deleteGoods(goodsId);
+	// 	return ResponseEntity.ok().build();  // 상태 코드 200 OK
+	// }
+
+	@PostMapping("/deleteGoods")
+	public ResponseEntity<Void> deleteGoodsBulk(@RequestBody List<Integer> goodsIds) {
+		adminService.deleteGoods(goodsIds);
+		return ResponseEntity.ok().build();
 	}
 
 	@PutMapping("/updateGoods/{goodsId}")

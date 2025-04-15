@@ -106,53 +106,53 @@ public class AdminServiceImpl implements AdminService {
 				.build());
 	}
 
-	@Override
 	@Transactional
-	public void deleteGoods(int goodsId) {
-		Goods goods = adminRepositoryGoods.findByGoodsId(goodsId).orElse(null);
+	public void deleteGoods(List<Integer> goodsIds) {
+		List<Goods> goodsList = adminRepositoryGoods.findAllById(goodsIds);
 
-		if (goods != null) {
+		for (Goods goods : goodsList) {
 			adminRepositoryGoods.delete(goods);
-		}
 
-		// Inventory 재고 조정
-		Inventory inventory = inventoryRepository.findByProductCodeAndBranchName(
-			goods.getProductCode(), goods.getBranchName());
-
-		if (inventory.getQuantity() > 1) {
-			inventory.setQuantity(inventory.getQuantity() - 1);
-			inventoryRepository.save(inventory);
-		} else {
-			inventoryRepository.delete(inventory);
-		}
-
-		//  현재까지 누적 재고량 계산
-		List<InventoryLog> logs = inventoryLogRepository
-			.findByProductCodeAndBranchNameOrderByChangeDateAsc(
+			// Inventory 재고 조정
+			Inventory inventory = inventoryRepository.findByProductCodeAndBranchName(
 				goods.getProductCode(), goods.getBranchName());
 
-		int currentStock = 0;
-		for (InventoryLog log : logs) {
-			currentStock += (log.getChangeType() == ChangeType.IN)
-				? log.getQuantity()
-				: -log.getQuantity();
+			if (inventory != null) {
+				if (inventory.getQuantity() > 1) {
+					inventory.setQuantity(inventory.getQuantity() - 1);
+					inventoryRepository.save(inventory);
+				} else {
+					inventoryRepository.delete(inventory);
+				}
+
+				// 누적 재고 계산
+				List<InventoryLog> logs = inventoryLogRepository
+					.findByProductCodeAndBranchNameOrderByChangeDateAsc(
+						goods.getProductCode(), goods.getBranchName());
+
+				int currentStock = 0;
+				for (InventoryLog log : logs) {
+					currentStock += (log.getChangeType() == ChangeType.IN)
+						? log.getQuantity()
+						: -log.getQuantity();
+				}
+
+				int updatedStock = currentStock - 1;
+
+				// 로그 저장
+				inventoryLogRepository.save(
+					InventoryLog.builder()
+						.productCode(goods.getProductCode())
+						.branchName(goods.getBranchName())
+						.changeType(ChangeType.OUT)
+						.quantity(1)
+						.remainingStock(updatedStock)
+						.changeDate(LocalDateTime.now())
+						.build()
+				);
+			}
 		}
-
-		int updatedStock = currentStock - 1;
-
-		// 로그 저장
-		inventoryLogRepository.save(
-			InventoryLog.builder()
-				.productCode(goods.getProductCode())
-				.branchName(goods.getBranchName())
-				.changeType(ChangeType.OUT)
-				.quantity(1)
-				.remainingStock(updatedStock)
-				.changeDate(LocalDateTime.now())
-				.build()
-		);
 	}
-
 
 	@Override
 	@Transactional

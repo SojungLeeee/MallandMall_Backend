@@ -2,8 +2,8 @@ package com.exam.coupon;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,27 +17,43 @@ public class CouponServiceImpl implements CouponService {
 		this.couponRepository = couponRepository;
 	}
 
-	private Coupon createCoupon(String userId, String couponName, String minPrice, String benefits, String couponType) {
-		LocalDate expirationDate = LocalDate.now().plusMonths(1);
-		return Coupon.builder()
-			.userId(userId)
-			.couponName(couponName)
-			.minPrice(minPrice)
-			.expirationDate(expirationDate)
-			.benefits(benefits)
-			.couponType(couponType)
-			.build();
+	@Override
+	public Coupon enhanceCoupons(Coupon coupon1, Coupon coupon2) {
+		// 더 이상 쿠폰 타입에 제한 없음
+
+		int discount1 = extractNumberFromBenefits(coupon1.getBenefits());
+		int discount2 = extractNumberFromBenefits(coupon2.getBenefits());
+
+		int successRate = 100 - (discount1 + discount2);
+		int random = new Random().nextInt(100) + 1;
+
+		// 기존 쿠폰 삭제
+		couponRepository.delete(coupon1);
+		couponRepository.delete(coupon2);
+
+		if (random <= successRate) {
+			int enhancedDiscount = discount1 + discount2;
+			String enhancedName = "[오프라인] " + enhancedDiscount + "% 할인 쿠폰";
+
+			Coupon enhancedCoupon = Coupon.builder()
+				.userId(coupon1.getUserId())
+				.couponName(enhancedName)
+				.minPrice("30000")
+				.expirationDate(LocalDate.now().plusDays(30))
+				.benefits(enhancedDiscount + "%" + " 할인")
+				.couponType("offline") // 무조건 오프라인
+				.build();
+
+			return couponRepository.save(enhancedCoupon);
+		} else {
+			return null; // 실패 시 아무것도 반환하지 않음
+		}
 	}
 
 	@Override
 	public void addNewMemberOnlineCoupon(String userId) {
 		Coupon coupon = createCoupon(userId, "[온라인] 5% 할인 쿠폰", "30000", "5% 할인", "online");
 		couponRepository.save(coupon);
-	}
-	@Override
-	public Coupon findCouponById(Integer couponId) {
-		return couponRepository.findById(couponId)
-			.orElseThrow(() -> new IllegalArgumentException("해당 ID의 쿠폰이 없습니다: " + couponId));
 	}
 
 	@Override
@@ -51,39 +67,11 @@ public class CouponServiceImpl implements CouponService {
 		Coupon coupon = createCoupon(userId, "[오프라인] 20% 할인 쿠폰", "30000", "20% 할인", "offline");
 		couponRepository.save(coupon);
 	}
+
 	@Override
-	public Coupon enhanceCoupons(Coupon coupon1, Coupon coupon2) {
-		int discount1 = extractNumberFromBenefits(coupon1.getBenefits());
-		int discount2 = extractNumberFromBenefits(coupon2.getBenefits());
-
-		int successRate = 100 - (discount1 + discount2);
-		int random = new Random().nextInt(100) + 1;
-
-		couponRepository.delete(coupon1);
-		couponRepository.delete(coupon2);
-
-		if (random <= successRate) {
-			int enhancedDiscount = discount1 + discount2;
-			String enhancedName = enhancedDiscount + "% 할인 쿠폰";
-
-			Coupon enhancedCoupon = Coupon.builder()
-				.userId(coupon1.getUserId())
-				.couponName(enhancedName)
-				.minPrice("10000")
-				.expirationDate(LocalDate.now().plusDays(30))
-				.benefits(enhancedDiscount + "%")
-				.couponType(coupon1.getCouponType())
-				.build();
-
-			return couponRepository.save(enhancedCoupon);
-		} else {
-			return null;
-		}
-	}
-
-	// 숫자만 추출하는 메서드
-	private int extractNumberFromBenefits(String benefits) {
-		return Integer.parseInt(benefits.replaceAll("[^0-9]", ""));
+	public Coupon findCouponById(Integer couponId) {
+		return couponRepository.findById(couponId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 ID의 쿠폰이 없습니다: " + couponId));
 	}
 
 	@Override
@@ -112,9 +100,22 @@ public class CouponServiceImpl implements CouponService {
 		couponRepository.deleteByCouponId(couponId);
 	}
 
+	// 쿠폰 생성 유틸
+	private Coupon createCoupon(String userId, String name, String minPrice, String benefits, String type) {
+		return Coupon.builder()
+			.userId(userId)
+			.couponName(name)
+			.minPrice(minPrice)
+			.expirationDate(LocalDate.now().plusDays(30))
+			.benefits(benefits)
+			.couponType(type)
+			.build();
+	}
 
+	private int extractNumberFromBenefits(String benefits) {
+		return Integer.parseInt(benefits.replaceAll("[^0-9]", ""));
+	}
 
-	// 할인율 문자열에서 숫자만 추출하는 유틸 메서드 추가
 	private int extractDiscountPercentage(String benefits) {
 		try {
 			return Integer.parseInt(benefits.replaceAll("[^0-9]", ""));

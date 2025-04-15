@@ -100,6 +100,7 @@ public class AdminServiceImpl implements AdminService {
 				.productCode(goodsDTO.getProductCode())
 				.branchName(goodsDTO.getBranchName())
 				.changeType(ChangeType.IN)
+				.remainingStock(updatedStock)
 				.quantity(goodsDTO.getQuantity())
 				.changeDate(LocalDateTime.now())
 				.build());

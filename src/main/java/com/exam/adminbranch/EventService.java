@@ -1,5 +1,6 @@
 package com.exam.adminbranch;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EventService {
@@ -18,4 +19,7 @@ public interface EventService {
 
 	// 사용자 ID로 선호 카테고리와 관련된 이벤트를 가져오는 메소드
 	List<EventDTO> getFavoriteEvents(String userId);
+
+	//쿠폰 자동삭제 로직
+	void deleteExpiredEvent(LocalDateTime now);
 }

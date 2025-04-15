@@ -2,6 +2,7 @@ package com.exam.admin;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -110,43 +111,42 @@ public class AdminServiceImpl implements AdminService {
 	public void deleteGoods(List<Integer> goodsIds) {
 		List<Goods> goodsList = adminRepositoryGoods.findAllById(goodsIds);
 
-		for (Goods goods : goodsList) {
-			adminRepositoryGoods.delete(goods);
+		// 1. 그룹핑 (productCode + branchName 기준)
+		Map<String, List<Goods>> grouped = goodsList.stream()
+			.collect(Collectors.groupingBy(g -> g.getProductCode() + "_" + g.getBranchName()));
 
-			// Inventory 재고 조정
-			Inventory inventory = inventoryRepository.findByProductCodeAndBranchName(
-				goods.getProductCode(), goods.getBranchName());
+		for (Map.Entry<String, List<Goods>> entry : grouped.entrySet()) {
+			List<Goods> group = entry.getValue();
+			String productCode = group.get(0).getProductCode();
+			String branchName = group.get(0).getBranchName();
+			int deleteCount = group.size();
 
+			// 2. 삭제는 여전히 개별로 수행
+			for (Goods goods : group) {
+				adminRepositoryGoods.delete(goods);
+			}
+
+			// 3. 재고 감소
+			Inventory inventory = inventoryRepository.findByProductCodeAndBranchName(productCode, branchName);
 			if (inventory != null) {
-				if (inventory.getQuantity() > 1) {
-					inventory.setQuantity(inventory.getQuantity() - 1);
+				int newQty = inventory.getQuantity() - deleteCount;
+
+				if (newQty > 0) {
+					inventory.setQuantity(newQty);
 					inventoryRepository.save(inventory);
 				} else {
 					inventoryRepository.delete(inventory);
+					newQty = 0; // 로그 용
 				}
 
-				// 누적 재고 계산
-				List<InventoryLog> logs = inventoryLogRepository
-					.findByProductCodeAndBranchNameOrderByChangeDateAsc(
-						goods.getProductCode(), goods.getBranchName());
-
-				int currentStock = 0;
-				for (InventoryLog log : logs) {
-					currentStock += (log.getChangeType() == ChangeType.IN)
-						? log.getQuantity()
-						: -log.getQuantity();
-				}
-
-				int updatedStock = currentStock - 1;
-
-				// 로그 저장
+				//  로그 저장 
 				inventoryLogRepository.save(
 					InventoryLog.builder()
-						.productCode(goods.getProductCode())
-						.branchName(goods.getBranchName())
+						.productCode(productCode)
+						.branchName(branchName)
 						.changeType(ChangeType.OUT)
-						.quantity(1)
-						.remainingStock(updatedStock)
+						.quantity(deleteCount)
+						.remainingStock(newQty)
 						.changeDate(LocalDateTime.now())
 						.build()
 				);

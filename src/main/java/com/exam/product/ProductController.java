@@ -1,9 +1,17 @@
 package com.exam.product;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -14,14 +22,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.exam.product.elasticsearch.ElasticsearchSearchService;
+
 @RestController
 @RequestMapping("/product")
+@Slf4j
 public class ProductController {
 
 	private final ProductService productService;
+	private final ElasticsearchSearchService elasticsearchSearchService;
 
-	public ProductController(ProductService productService) {
+	public ProductController(ProductService productService, ElasticsearchSearchService elasticsearchSearchService) {
 		this.productService = productService;
+		this.elasticsearchSearchService = elasticsearchSearchService;
 	}
 
 	//  전체 상품 목록 조회
@@ -119,5 +132,6 @@ public class ProductController {
 		List<Product> products = productService.getProductsSorted(sort);
 		return ResponseEntity.ok(products);
 	}
+
 
 }

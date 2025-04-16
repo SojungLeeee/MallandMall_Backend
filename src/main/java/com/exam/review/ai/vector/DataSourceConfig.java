@@ -47,7 +47,7 @@ public class DataSourceConfig {
 		public DataSource dataSource() {
 			return DataSourceBuilder.create().build();
 		}
-
+		//MySQL
 		@Primary
 		@Bean(name = "entityManagerFactory")
 		public LocalContainerEntityManagerFactoryBean entityManagerFactory(
@@ -69,6 +69,7 @@ public class DataSourceConfig {
 					"com.exam.offline",
 					"com.exam.orderinfo",
 					"com.exam.product",
+					"com.exam.product.elasticsearch",
 					"com.exam.quartz",
 					"com.exam.question",
 					"com.exam.review",

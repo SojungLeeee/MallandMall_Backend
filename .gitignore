@@ -38,4 +38,4 @@ out/
 
 # Ignore application-secret.properties to protect sensitive data
 /application-secret.properties
-
+/application.prroperties

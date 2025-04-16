@@ -33,6 +33,9 @@ public class ReviewAnalysisVector {
 	@Column(name = "negative_points_embedding", columnDefinition = "text")
 	private String negativePointsEmbedding;
 
+	@Column(name = "product_name")
+	private String productName;
+
 	// 생성 시간 필드 추가
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;

@@ -101,35 +101,24 @@ public class ReviewAnalysisVectorService {
 	@Transactional("vectorTransactionManager")
 	public void saveReviewAnalysisVector(int analysisId,
 		String productCode,
+		String productName,
 		String reviewsText,
 		String summary,
 		List<String> positivePoints,
 		List<String> negativePoints) {
 
 		try {
-			log.info("벡터 저장 시작 - 분석 ID: {}, 상품 코드: {}", analysisId, productCode);
+			log.info("벡터 저장/업데이트 시작 - 분석 ID: {}, 상품 코드: {}, 상품명: {}", analysisId, productCode, productName);
 
-			// 리뷰 텍스트 임베딩
+			// 임베딩 생성 부분은 동일...
 			float[] reviewTextEmbedding = createEmbedding(reviewsText);
-			log.info("리뷰 텍스트 임베딩 생성 완료: {} 차원", reviewTextEmbedding.length);
-
-			// 요약 임베딩
 			float[] summaryEmbedding = createEmbedding(summary);
-			log.info("요약 임베딩 생성 완료: {} 차원", summaryEmbedding.length);
 
-			// 긍정적 포인트 임베딩 (모든 포인트를 결합)
 			String positiveText = String.join(" ", positivePoints);
-			float[] positiveEmbedding = positiveText.isEmpty() ?
-				new float[0] :
-				createEmbedding(positiveText);
-			log.info("긍정 포인트 임베딩 생성 완료: {} 차원", positiveEmbedding.length);
+			float[] positiveEmbedding = positiveText.isEmpty() ? new float[0] : createEmbedding(positiveText);
 
-			// 부정적 포인트 임베딩 (모든 포인트를 결합)
 			String negativeText = String.join(" ", negativePoints);
-			float[] negativeEmbedding = negativeText.isEmpty() ?
-				new float[0] :
-				createEmbedding(negativeText);
-			log.info("부정 포인트 임베딩 생성 완료: {} 차원", negativeEmbedding.length);
+			float[] negativeEmbedding = negativeText.isEmpty() ? new float[0] : createEmbedding(negativeText);
 
 			// 벡터 포맷팅
 			String reviewTextEmbeddingsStr = formatVector(reviewTextEmbedding);
@@ -137,27 +126,41 @@ public class ReviewAnalysisVectorService {
 			String positivePointsEmbeddingStr = formatVector(positiveEmbedding);
 			String negativePointsEmbeddingStr = formatVector(negativeEmbedding);
 
-			// 네이티브 SQL로 직접 삽입 (::vector 캐스팅 포함)
-			String sql = "INSERT INTO review_analysis_vector " +
-				"(analysis_id, product_code, review_text_embeddings, summary_embedding, " +
-				"positive_points_embedding, negative_points_embedding, created_at) " +
-				"VALUES (?, ?, ?::vector, ?::vector, ?::vector, ?::vector, ?)";
+			// 기존 데이터 확인
+			Optional<ReviewAnalysisVector> existingVectorOpt = vectorRepository.findByProductCode(productCode);
 
-			int rowsAffected = jdbcTemplate.update(sql,
-				analysisId,
-				productCode,
-				reviewTextEmbeddingsStr,
-				summaryEmbeddingStr,
-				positivePointsEmbeddingStr,
-				negativePointsEmbeddingStr,
-				Timestamp.valueOf(LocalDateTime.now())
-			);
+			if (existingVectorOpt.isPresent()) {
+				// 기존 벡터 업데이트
+				ReviewAnalysisVector existingVector = existingVectorOpt.get();
+				existingVector.setProductName(productName);
+				existingVector.setReviewTextEmbeddings(reviewTextEmbeddingsStr);
+				existingVector.setSummaryEmbedding(summaryEmbeddingStr);
+				existingVector.setPositivePointsEmbedding(positivePointsEmbeddingStr);
+				existingVector.setNegativePointsEmbedding(negativePointsEmbeddingStr);
+				existingVector.setCreatedAt(LocalDateTime.now()); // 업데이트 시간으로 갱신
 
-			log.info("벡터 저장 완료 - 분석 ID: {}, 영향받은 행: {}", analysisId, rowsAffected);
+				vectorRepository.save(existingVector);
+				log.info("기존 벡터 업데이트 완료 - 상품 코드: {}", productCode);
+			} else {
+				// 새 벡터 생성
+				ReviewAnalysisVector newVector = ReviewAnalysisVector.builder()
+					.analysisId(analysisId)
+					.productCode(productCode)
+					.productName(productName)
+					.reviewTextEmbeddings(reviewTextEmbeddingsStr)
+					.summaryEmbedding(summaryEmbeddingStr)
+					.positivePointsEmbedding(positivePointsEmbeddingStr)
+					.negativePointsEmbedding(negativePointsEmbeddingStr)
+					.createdAt(LocalDateTime.now())
+					.build();
+
+				vectorRepository.save(newVector);
+				log.info("새 벡터 저장 완료 - 분석 ID: {}", analysisId);
+			}
 
 		} catch (Exception e) {
-			log.error("벡터 저장 중 오류 발생: {}", e.getMessage(), e);
-			throw new RuntimeException("벡터 저장 실패: " + e.getMessage(), e);
+			log.error("벡터 저장/업데이트 중 오류 발생: {}", e.getMessage(), e);
+			throw new RuntimeException("벡터 저장/업데이트 실패: " + e.getMessage(), e);
 		}
 	}
 
@@ -175,6 +178,20 @@ public class ReviewAnalysisVectorService {
 			log.error("요약 기반 검색 중 오류: {}", e.getMessage(), e);
 			throw new RuntimeException("유사 제품 검색 실패: " + e.getMessage(), e);
 		}
+	}
+
+	//벡터 맵으로 반환
+	private List<Map<String, Object>> convertToResultMap(List<Object[]> results) {
+		return results.stream()
+			.map(result -> {
+				Map<String, Object> map = new HashMap<>();
+				map.put("analysis_id", result[0]);
+				map.put("product_code", result[1]);
+				map.put("product_name", result[2]); // product_name 필드 추가
+				map.put("similarity", result[3]); // 인덱스가 하나 증가
+				return map;
+			})
+			.collect(Collectors.toList());
 	}
 
 	// 긍정적 감정 기반 유사 제품 검색
@@ -210,16 +227,26 @@ public class ReviewAnalysisVectorService {
 	}
 
 	// 결과를 Map으로 변환
-	private List<Map<String, Object>> convertToResultMap(List<Object[]> results) {
-		return results.stream()
-			.map(result -> {
-				Map<String, Object> map = new HashMap<>();
-				map.put("analysis_id", result[0]);
-				map.put("product_code", result[1]);
-				map.put("similarity", result[2]);
-				return map;
-			})
-			.collect(Collectors.toList());
+	private List<Map<String, Object>> convertToRankingResults(List<Object[]> results) {
+		List<Map<String, Object>> rankings = new ArrayList<>();
+		int rank = 1;
+
+		for (Object[] result : results) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("rank", rank++);
+			item.put("analysis_id", result[0]);
+			item.put("product_code", result[1]);
+			item.put("product_name", result[2]); // product_name 필드 추가
+			item.put("similarity", result[3]); // 인덱스가 하나 증가
+
+			// 임의의 순위 변동
+			double randomChange = Math.random() * 6 - 3; // -3 ~ +3
+			item.put("rankChange", (int) randomChange);
+
+			rankings.add(item);
+		}
+
+		return rankings;
 	}
 
 	// 벡터 포맷팅 (PostgreSQL에 맞게)

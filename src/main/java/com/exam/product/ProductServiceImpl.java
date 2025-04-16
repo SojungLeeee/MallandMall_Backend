@@ -50,6 +50,19 @@ public class ProductServiceImpl implements ProductService {
 		}).collect(Collectors.toList());
 	}
 
+	// 다중 상품 코드로 상품 조회하기 (추가된 메서드)
+	@Override
+	public List<ProductDTO> getProductsByProductCodes(List<String> productCodes) {
+		// 여러 상품 코드로 상품 조회
+		List<Product> products = productRepository.findAllByProductCodeIn(productCodes);
+
+		// 각 상품에 대해 평균 별점 계산 후 ProductDTO로 변환
+		return products.stream().map(product -> {
+			double avgRating = reviewRepository.getAverageRating(product.getProductCode()); // 평균 별점 가져오기
+			return convertToDTO(product, avgRating);
+		}).collect(Collectors.toList());
+	}
+
 	// entity에서 dto로 만들기
 	private ProductDTO convertToDTO(Product product, double avgRating) {
 		return ProductDTO.builder()

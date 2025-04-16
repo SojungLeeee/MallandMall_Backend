@@ -74,7 +74,8 @@ public class DataSourceConfig {
 					"com.exam.review",
 					"com.exam.security",
 					"com.exam.social",
-					"com.exam.user"
+					"com.exam.user",
+					"com.exam.search.keyword"
 					// "com.exam.review.ai.vector"는 제외
 				)
 				.persistenceUnit("main")

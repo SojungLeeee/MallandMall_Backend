@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "keywordProductMapping")
+@Table(name = "keywordproductmapping")
 @Getter
 @Setter
 public class KeywordProductMapping {

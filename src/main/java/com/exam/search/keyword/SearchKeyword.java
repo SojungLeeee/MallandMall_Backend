@@ -14,7 +14,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "searchKeywords")
+@Table(name = "searchkeywords")
 @Getter
 @Setter
 public class SearchKeyword {

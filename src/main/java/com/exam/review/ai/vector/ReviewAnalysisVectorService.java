@@ -101,13 +101,14 @@ public class ReviewAnalysisVectorService {
 	@Transactional("vectorTransactionManager")
 	public void saveReviewAnalysisVector(int analysisId,
 		String productCode,
+		String productName, // 상품명 파라미터 추가
 		String reviewsText,
 		String summary,
 		List<String> positivePoints,
 		List<String> negativePoints) {
 
 		try {
-			log.info("벡터 저장 시작 - 분석 ID: {}, 상품 코드: {}", analysisId, productCode);
+			log.info("벡터 저장 시작 - 분석 ID: {}, 상품 코드: {}, 상품명: {}", analysisId, productCode, productName);
 
 			// 리뷰 텍스트 임베딩
 			float[] reviewTextEmbedding = createEmbedding(reviewsText);
@@ -139,13 +140,14 @@ public class ReviewAnalysisVectorService {
 
 			// 네이티브 SQL로 직접 삽입 (::vector 캐스팅 포함)
 			String sql = "INSERT INTO review_analysis_vector " +
-				"(analysis_id, product_code, review_text_embeddings, summary_embedding, " +
+				"(analysis_id, product_code, product_name, review_text_embeddings, summary_embedding, " +
 				"positive_points_embedding, negative_points_embedding, created_at) " +
-				"VALUES (?, ?, ?::vector, ?::vector, ?::vector, ?::vector, ?)";
+				"VALUES (?, ?, ?, ?::vector, ?::vector, ?::vector, ?::vector, ?)";
 
 			int rowsAffected = jdbcTemplate.update(sql,
 				analysisId,
 				productCode,
+				productName, // 상품명 추가
 				reviewTextEmbeddingsStr,
 				summaryEmbeddingStr,
 				positivePointsEmbeddingStr,
@@ -175,6 +177,20 @@ public class ReviewAnalysisVectorService {
 			log.error("요약 기반 검색 중 오류: {}", e.getMessage(), e);
 			throw new RuntimeException("유사 제품 검색 실패: " + e.getMessage(), e);
 		}
+	}
+
+	//벡터 맵으로 반환
+	private List<Map<String, Object>> convertToResultMap(List<Object[]> results) {
+		return results.stream()
+			.map(result -> {
+				Map<String, Object> map = new HashMap<>();
+				map.put("analysis_id", result[0]);
+				map.put("product_code", result[1]);
+				map.put("product_name", result[2]); // product_name 필드 추가
+				map.put("similarity", result[3]); // 인덱스가 하나 증가
+				return map;
+			})
+			.collect(Collectors.toList());
 	}
 
 	// 긍정적 감정 기반 유사 제품 검색
@@ -210,16 +226,26 @@ public class ReviewAnalysisVectorService {
 	}
 
 	// 결과를 Map으로 변환
-	private List<Map<String, Object>> convertToResultMap(List<Object[]> results) {
-		return results.stream()
-			.map(result -> {
-				Map<String, Object> map = new HashMap<>();
-				map.put("analysis_id", result[0]);
-				map.put("product_code", result[1]);
-				map.put("similarity", result[2]);
-				return map;
-			})
-			.collect(Collectors.toList());
+	private List<Map<String, Object>> convertToRankingResults(List<Object[]> results) {
+		List<Map<String, Object>> rankings = new ArrayList<>();
+		int rank = 1;
+
+		for (Object[] result : results) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("rank", rank++);
+			item.put("analysis_id", result[0]);
+			item.put("product_code", result[1]);
+			item.put("product_name", result[2]); // product_name 필드 추가
+			item.put("similarity", result[3]); // 인덱스가 하나 증가
+
+			// 임의의 순위 변동
+			double randomChange = Math.random() * 6 - 3; // -3 ~ +3
+			item.put("rankChange", (int) randomChange);
+
+			rankings.add(item);
+		}
+
+		return rankings;
 	}
 
 	// 벡터 포맷팅 (PostgreSQL에 맞게)

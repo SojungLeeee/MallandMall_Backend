@@ -75,12 +75,13 @@ public class ReviewAnalysisService {
 		response.setProductName(product.getProductName());
 		response.setAverageRating(averageRating);
 		response.setReviewCount(reviews.size());
-		// 시맨틱 검색을 위한 벡터 저장 - 이 블록 추가
 
+		// 시맨틱 검색을 위한 벡터 저장 - 이 블록 추가
 		try {
 			vectorService.saveReviewAnalysisVector(
 				response.hashCode(), // 또는 더 나은 ID 생성 전략
 				productCode,
+				product.getProductName(), // 상품명 추가
 				reviewTexts,
 				response.getSummary(),
 				response.getKeyPositivePoints(),

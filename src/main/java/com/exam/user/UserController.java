@@ -56,6 +56,8 @@ public class UserController {
 		dto.setPassword(encodedPW);
 		userService.save(dto);
 
+		System.out.println("회원가입 완료");
+
 		return ResponseEntity.created(null).body(dto);  // 201 상태코드 반환됨.
 	}
 
